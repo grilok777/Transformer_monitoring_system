@@ -4,9 +4,10 @@ import com.example.entity.Role;
 import com.example.entity.User;
 import com.example.models.Admin;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
-
+//@Component
 public class Starter implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
