@@ -1,30 +1,33 @@
 package com.example.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@Entity
 @Data
-@SuperBuilder
+@NoArgsConstructor
 @AllArgsConstructor
-//@Table(name = "users")
-public abstract class User {
+@SuperBuilder
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@Table(name = "users")
+public class User {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+
+    @Column(nullable = false)
     private String nameUKR;
-    @Column
+
+    @Column(nullable = false, unique = true)
     private String email;
-    @Column
+
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = false)
     private Role role;
-
-    public User() {
-
-    }
 }

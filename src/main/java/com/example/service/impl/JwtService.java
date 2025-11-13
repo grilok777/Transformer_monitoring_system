@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "5E422E615D7C1D6F517A2443455E5D672E784D4428472B4B6250655368566D88";
+    private static final String SECRET_KEY = "5E422E615D7C1D6F517A2443455E5D672E784D4428472B4B6250655368514D88";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,7 +31,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 години
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

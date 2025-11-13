@@ -1,8 +1,7 @@
-package com.example.dto;
+package com.example.dto.request;
 
 public record RegisterRequest(
-        String name,
+        String nameUKR,
         String email,
         String password
-) {
-}
+) {}
