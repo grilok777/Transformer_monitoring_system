@@ -11,9 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Alert {
 
     @Id
-    private String id;
+    private Long id; //Long
 
-    private String transformerId;
+    private Long transformerId; //Long
 
     private String message;
 
@@ -32,7 +32,7 @@ public class Alert {
 
     public Alert() {}
 
-    public Alert(String id, String tId, String message, AlertLevel level, Double temp, Double volt, String timestamp, int problemResolved) {
+    public Alert(Long id, Long tId, String message, AlertLevel level, Double temp, Double volt, String timestamp, int problemResolved) {
         this.id = id;
         this.transformerId = tId;
         this.message = message;

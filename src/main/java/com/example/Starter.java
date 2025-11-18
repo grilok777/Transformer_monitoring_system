@@ -1,12 +1,16 @@
 package com.example;
 
+import com.example.dto.TransformerDto;
 import com.example.dto.UserDto;
 import com.example.dto.request.*;
 
 import com.example.entity.Role;
 import com.example.exception.InvalidPasswordException;
+import com.example.model.Transformer;
+import com.example.service.impl.OperatorServiceImpl;
 import com.example.service.interfaces.AuthService;
 import com.example.service.impl.CreatorServiceImpl;
+
 import com.example.service.interfaces.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -22,11 +26,13 @@ public class Starter implements CommandLineRunner {
     private final CreatorServiceImpl creatorService;
     private String currentToken;
     private final Scanner scanner = new Scanner(System.in);
+    private final OperatorServiceImpl operatorService;
 
-    public Starter(UserService userService, AuthService authService, CreatorServiceImpl creatorService) {
+    public Starter(UserService userService, AuthService authService, CreatorServiceImpl creatorService, OperatorServiceImpl operatorService) {
         this.userService = userService;
         this.authService = authService;
         this.creatorService = creatorService;
+        this.operatorService = operatorService;
     }
 
     @Override
@@ -43,6 +49,10 @@ public class Starter implements CommandLineRunner {
                 case 5 -> setNewName();
                 case 6 -> showUsers();
                 case 7 -> setNewRole();
+                case 8 -> showAllTransformers();
+                case 9 -> showTransformerById();
+                case 10 -> showTransformerAlerts();
+                case 11 -> processTransformerError();
                 case 0 -> {
                     System.out.println("Exiting...");
                     return;
@@ -96,6 +106,12 @@ public class Starter implements CommandLineRunner {
         System.out.println("5. Change name");
         System.out.println("6. Show users");
         System.out.println("7. Change role");
+
+        System.out.println("8. Show all transformers");
+        System.out.println("9. Show transformer by ID");
+        System.out.println("10. Show transformer alerts");
+        System.out.println("11. Process transformer error");
+
         System.out.println("0. Exit");
         System.out.print("Your choice: ");
     }
@@ -223,6 +239,54 @@ public class Starter implements CommandLineRunner {
             System.out.println("Name updated successfully!");
         } catch (RuntimeException e) {
             System.err.println("Failed to update name: " + e.getMessage());
+        }
+    }
+
+    private void showAllTransformers() {
+        var list = operatorService.getAllTransformersStatus();
+        if (list.isEmpty()) {
+            System.out.println("No transformers found.");
+            return;
+        }
+        list.forEach(t -> System.out.println(t.toString()));
+    }
+
+    private void showTransformerById() {
+        System.out.print("Enter transformer ID: ");
+        String id = scanner.nextLine().trim();
+
+        try {
+            TransformerDto t = operatorService.getTransformerStatus(Long.valueOf(id));//Long.valueOf(id)
+            System.out.println(t);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    private void showTransformerAlerts() {
+        System.out.print("Enter transformer ID: ");
+        String id = scanner.nextLine().trim();
+        try {
+            var alerts = operatorService.getTransformerAlerts(Long.valueOf(id));//Long.valueOf(id)
+
+            if (alerts.isEmpty()) {
+                System.out.println("No alerts for this transformer.");
+                return;
+            }
+
+            alerts.forEach(System.out::println);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void processTransformerError() {
+        System.out.print("Enter transformer ID: ");
+        String id = scanner.nextLine().trim();
+        try {
+            operatorService.addErrorProcessing(Long.valueOf(id));//Long.valueOf(id)
+            System.out.println("Error processed.");
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
         }
     }
 }

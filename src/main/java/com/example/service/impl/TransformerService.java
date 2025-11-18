@@ -2,9 +2,8 @@ package com.example.service.impl;
 
 import com.example.model.Transformer;
 import com.example.model.TransformerStatus;
-import com.example.repository.TransformerRepository;
+import com.example.repository.mongo.TransformerRepository;
 
-import com.example.service.impl.AlertService;
 import com.example.model.AlertLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,21 +25,25 @@ public class TransformerService {
         this.serviceA = serviceA;
     }
 
-    public Optional<Transformer> getById(String id) {
+    public Optional<Transformer> getById(Long id) {
         return repository.findById(id);
+    }
+
+    public List<Transformer> getAll() {
+        return repository.findAll();
     }
 
     public Transformer save(Transformer t) {
         return repository.save(t);
     }
 
-    public TransformerStatus updateStatus(String transformerId) {
+    public TransformerStatus checkStatus(Long transformerId) {
         Transformer transformer = repository.findById(transformerId)
                 .orElseThrow(() -> new RuntimeException("Transformer not found with id: " + transformerId));
         return transformer.getStatus();
     }
 
-    public void updateData(String id, Double power, Double temp, Double voltage) {
+    public void updateData(Long id, Double power, Double temp, Double voltage) {
 
         Transformer t = repository.findById(id).orElseThrow();
 
@@ -64,7 +67,7 @@ public class TransformerService {
     }
 
     // --- Оновлення статусу (перероблений метод) ---
-    public void updateStatus(String transformerId, double temp, double voltage) {
+    public void updateStatus(Long transformerId, double temp, double voltage) {//Long
         Transformer transformer = repository.findById(transformerId)
                 .orElseThrow(() -> new RuntimeException("Transformer not found with id: " + transformerId));
 

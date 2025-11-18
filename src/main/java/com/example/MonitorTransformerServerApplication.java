@@ -1,8 +1,5 @@
-<<<<<<< Updated upstream
+
 package com.example;
-=======
-/*package com.example;
->>>>>>> Stashed changes
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,16 +10,17 @@ public class MonitorTransformerServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MonitorTransformerServerApplication.class, args);
 	}
-<<<<<<< Updated upstream
-=======
-}*/
-package com.example;
 
+}
+/*
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
 //579af6c1-3665-4633-a738-ad929fa3c11e
+@EnableMongoRepositories(basePackages = "com.example.repository.mongo")
 @SpringBootApplication
 public class MonitorTransformerServerApplication {
 
@@ -35,5 +33,5 @@ public class MonitorTransformerServerApplication {
 		StarterSimulator starterService = context.getBean(StarterSimulator.class);
 		starterService.startActiveTransformers();
 	}
->>>>>>> Stashed changes
-}
+
+}*/

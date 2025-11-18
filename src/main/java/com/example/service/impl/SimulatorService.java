@@ -1,19 +1,16 @@
 package com.example.service.impl;
 
-import com.example.model.Alert;
-import com.example.model.AlertLevel;
 import com.example.model.Transformer;
-import com.example.model.TransformerStatus;
 
-import com.example.repository.AlertRepository;
-import com.example.repository.TransformerRepository;
+import com.example.repository.mongo.AlertRepository;
+import com.example.repository.mongo.TransformerRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
-import java.time.LocalDateTime;
+
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -43,7 +40,7 @@ public class SimulatorService {
 
     // ---------------- Запуск симуляції ----------------
 
-    public void startSimulation(String transformerId) {
+    public void startSimulation(Long transformerId) {//Long
         Optional<Transformer> opt = transformerRepository.findById(transformerId);
 
         if (opt.isEmpty()) {
@@ -53,7 +50,7 @@ public class SimulatorService {
 
         executor.scheduleAtFixedRate(
                 () -> simulateStep(transformerId),
-                5, 20, TimeUnit.SECONDS
+                5, 20, TimeUnit.SECONDS //240
         );
 
         log.info("Simulation started for transformer {}", transformerId);
@@ -62,7 +59,7 @@ public class SimulatorService {
 
     // ---------------- Один крок симуляції ----------------
 
-    private void simulateStep(String transformerId) {
+    private void simulateStep(Long transformerId) {//Long
         try {
             Transformer t = transformerService.getById(transformerId).orElseThrow();
 

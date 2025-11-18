@@ -2,7 +2,7 @@ package com.example.service.impl;
 
 import com.example.model.Alert;
 import com.example.model.AlertLevel;
-import com.example.repository.AlertRepository;
+import com.example.repository.mongo.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +22,20 @@ public class AlertService {
     }
 
 
-    private String getNextId() {
+    private Long getNextId() {
         Optional<Alert> lastAlert = repository.findTopByOrderByIdDesc();
         // Якщо останній алерт існує, беремо його ID і додаємо 1, інакше починаємо з 1.
         long nextId = lastAlert
-                .map(alert -> Long.parseLong(alert.getId()))  // перетворюємо у long
+                .map(alert -> alert.getId())// .map(alert -> Long.parseLong(alert.getId()))   // перетворюємо у long
                 .map(id -> id + 1)                            // +1 коректно
                 .orElse(1L);                                  // якщо немає записів → ID = 1
 
-        return String.valueOf(nextId);
+        return nextId;//String.valueOf(nextId)
     }
 
 
-    public Alert createAndSaveAlert(String transformerId, String message, AlertLevel level, Double temp, Double volt) {
-        String newId = (String) getNextId();
+    public Alert createAndSaveAlert(Long transformerId, String message, AlertLevel level, Double temp, Double volt) {
+        Long newId = getNextId();
 
 
         Alert alert = new Alert(
@@ -64,5 +64,21 @@ public class AlertService {
                 .stream()
                 .filter(a -> a.getProblemResolved() == 0)
                 .collect(Collectors.toList());
+    }
+
+    public List<Alert> getAlertsByTransformerId(Long transformerId) {//Long
+        return repository.findByTransformerId(transformerId);
+    }
+
+    public Alert createOperatorNote(Long id) {
+        // Знаходимо існуючий alert
+        Alert alert = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Alert not found: " + id));
+
+        // Оновлюємо тільки потрібне поле
+        alert.setProblemResolved(1);
+
+        // Зберігаємо назад
+        return repository.save(alert);
     }
 }

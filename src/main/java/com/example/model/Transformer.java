@@ -15,7 +15,7 @@ import java.util.Map;
 public class Transformer {
 
     @Id
-    private String id;
+    private Long id; //Long
 
     private String manufacturer;
 
