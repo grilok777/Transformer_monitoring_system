@@ -75,6 +75,14 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 
+<<<<<<< Updated upstream
+=======
+		<!-- Spring Boot Starter для MongoDB -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+>>>>>>> Stashed changes
 		<!-- Тести -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
