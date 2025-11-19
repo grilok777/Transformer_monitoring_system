@@ -1,46 +1,41 @@
 package com.example.service.impl;
 
-import com.example.model.Transformer;
-
-import com.example.repository.mongo.AlertRepository;
+import com.example.entity.mongo.Transformer;
 import com.example.repository.mongo.TransformerRepository;
-
+import com.example.service.interfaces.SimulatorService;
+import com.example.service.interfaces.TransformerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import jakarta.annotation.PostConstruct;
 
 import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SimulatorService {
+public class SimulatorServiceImpl implements SimulatorService {
 
     private final TransformerRepository transformerRepository;
-    private final AlertRepository alertRepository;
-    private final AlertService alertService;
     private final TransformerService transformerService;
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
-    private final Random random = new Random();
+    private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     private final double steelLoss = 2;
     private final double copperLossNominal = 10.5;
-
 
     @PostConstruct
     public void init() {
         log.info("Simulator ready. Waiting for startSimulation() calls.");
     }
 
-
-    // ---------------- Запуск симуляції ----------------
-
-    public void startSimulation(Long transformerId) {//Long
+    @Override
+    public void startSimulation(Long transformerId) {
         Optional<Transformer> opt = transformerRepository.findById(transformerId);
 
         if (opt.isEmpty()) {
@@ -50,20 +45,17 @@ public class SimulatorService {
 
         executor.scheduleAtFixedRate(
                 () -> simulateStep(transformerId),
-                5, 20, TimeUnit.SECONDS //240
+                5, 20, TimeUnit.SECONDS
         );
 
         log.info("Simulation started for transformer {}", transformerId);
     }
 
-
-    // ---------------- Один крок симуляції ----------------
-
-    private void simulateStep(Long transformerId) {//Long
+    private void simulateStep(Long transformerId) {
         try {
             Transformer t = transformerService.getById(transformerId).orElseThrow();
 
-            double loadFactor = 0.788 + random.nextDouble() * 0.088; //0.788-0.876
+            double loadFactor = 0.788 + random.nextDouble() * 0.088;
             double efficiency = calculateEfficiency(t.getRatedPowerKVA(), loadFactor);
             double power = t.getRatedPowerKVA() * efficiency;
             double temperature = calculateTemperature(loadFactor);
@@ -73,12 +65,9 @@ public class SimulatorService {
                     * t.getSecondaryVoltageKV() * loadFactor);
 
             double voltage = (power / currentAmpere) * loadFactor;
-            //voltage = (power / (power / (Math.pow(num, 1.0 / 3.0) * t.getSecondaryVoltageKV() * loadFactor))) * loadFactor;
-            // оновити статус (через сервіс)
-            transformerService.updateStatus(transformerId, temperature, voltage);
-            //Transformer
-            transformerService.updateData(transformerId, power, temperature, voltage);
 
+            transformerService.updateStatus(transformerId, temperature, voltage);
+            transformerService.updateData(transformerId, power, temperature, voltage);
 
             log.info(
                     "Load: {}% | Power: {} kW | Temp: {}°C | Volt: {} kV | Eff: {}% | Status: {}",
@@ -95,9 +84,6 @@ public class SimulatorService {
         }
     }
 
-
-    // ---------------- Розрахунки ----------------
-
     private double calculateEfficiency(double ratedPower, double loadFactor) {
         double copperLoss = copperLossNominal * Math.pow(loadFactor, 2);
         return ratedPower * loadFactor /
@@ -107,10 +93,8 @@ public class SimulatorService {
     private double calculateTemperature(double loadFactor) {
         double ambient = 20 + random.nextDouble() * 20;
         double Rth = 7.0;
-
         double copperLoss = copperLossNominal * Math.pow(loadFactor, 2);
         double totalLoss = steelLoss + copperLoss;
-
         return ambient + totalLoss * Rth;
     }
 }

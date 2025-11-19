@@ -1,4 +1,4 @@
-package com.example.entity;
+package com.example.entity.postgres;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "users")
+
 public class User {
 
     @Id

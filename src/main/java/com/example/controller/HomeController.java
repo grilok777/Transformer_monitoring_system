@@ -3,7 +3,7 @@ package com.example.controller;
 import com.example.config.CustomUserDetails;
 import com.example.dto.UserDto;
 import com.example.dto.response.MessageResponse;
-import com.example.entity.Role;
+import com.example.entity.postgres.Role;
 import com.example.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/home")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+
 public class HomeController {
     private final UserService userService;
 

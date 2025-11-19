@@ -1,6 +1,6 @@
 package com.example.dto;
 
-import com.example.entity.Role;
+import com.example.entity.postgres.Role;
 
 public record UserDto(Long id,
                       String nameUKR,

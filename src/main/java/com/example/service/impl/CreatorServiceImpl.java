@@ -1,11 +1,11 @@
 package com.example.service.impl;
 
 import com.example.dto.UserDto;
-import com.example.entity.Role;
-import com.example.entity.User;
+import com.example.entity.postgres.Role;
+import com.example.entity.postgres.User;
 import com.example.exception.UserNotFoundException;
 import com.example.mapper.UserMapper;
-import com.example.repository.UserRepository;
+import com.example.repository.jpa.UserRepository;
 import com.example.service.interfaces.CreatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public Optional<UserDto> getUserByEmail(String email) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + email));
+                .orElseThrow(UserNotFoundException::new);
         return Optional.of(UserMapper.fromUserToDto(user));
     }
 

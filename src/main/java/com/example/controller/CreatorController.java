@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.dto.UserDto;
 import com.example.dto.response.MessageResponse;
-import com.example.entity.Role;
+import com.example.entity.postgres.Role;
 import com.example.service.interfaces.CreatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
