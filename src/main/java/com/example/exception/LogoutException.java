@@ -1,7 +1,11 @@
 package com.example.exception;
 
-public class LogoutException extends RuntimeException{
-    public LogoutException(String message){
+public class LogoutException extends RuntimeException {
+    public LogoutException(String message) {
         super(message);
+    }
+
+    public LogoutException() {
+        super("Logout failed");
     }
 }

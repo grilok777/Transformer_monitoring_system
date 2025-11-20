@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.response.MessageResponse;
 import com.example.service.interfaces.DataAnalystService;
 import com.example.service.interfaces.UserService;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,9 @@ public class DataAnalystController {
     private final DataAnalystService analystService;
     private final UserService userService;
 
-    public String makeReport(){
-        return ":";
+    @GetMapping("/send")
+    public MessageResponse sendReport(){
+        return new MessageResponse("");
     }
 
     @GetMapping("/transformer/{id}")

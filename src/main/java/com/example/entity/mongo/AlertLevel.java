@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.entity.mongo;
 
 public enum AlertLevel {
     INFO,

@@ -15,6 +15,7 @@ import com.example.service.interfaces.AuthService;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+
 public class AuthController {
     private final AuthService authService;
 

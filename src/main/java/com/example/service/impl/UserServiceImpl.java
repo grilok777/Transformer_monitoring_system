@@ -4,11 +4,12 @@ import com.example.dto.UserDto;
 import com.example.dto.request.ChangeNameRequest;
 import com.example.dto.request.ChangePasswordRequest;
 import com.example.dto.request.RegisterRequest;
-import com.example.entity.Role;
-import com.example.entity.User;
+import com.example.entity.postgres.Role;
+import com.example.entity.postgres.User;
+import com.example.exception.InvalidPasswordException;
 import com.example.exception.UserNotFoundException;
 import com.example.mapper.UserMapper;
-import com.example.repository.UserRepository;
+import com.example.repository.jpa.UserRepository;
 import com.example.service.interfaces.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -27,10 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void createUser(RegisterRequest request, Role role) {
-        if (role == null) {
-            role = Role.UNDEFINED;
-        }
-        User newUser = userFactory.createUser(role, request);
+        User newUser = userFactory.createUser(role != null ? role : Role.UNDEFINED, request);
         userRepository.save(newUser);
     }
 
@@ -38,10 +36,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void changePassword(ChangePasswordRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid old password");
+            throw new InvalidPasswordException("Invalid old password");
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));

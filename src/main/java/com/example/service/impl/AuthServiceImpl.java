@@ -7,22 +7,22 @@ import com.example.dto.request.LogoutRequest;
 import com.example.dto.request.RegisterRequest;
 import com.example.dto.response.JwtResponse;
 import com.example.dto.response.MessageResponse;
-import com.example.entity.RevokedToken;
-import com.example.entity.User;
-import com.example.entity.Role;
+import com.example.entity.postgres.RevokedToken;
+import com.example.entity.postgres.User;
+import com.example.entity.postgres.Role;
 import com.example.exception.EmailAlreadyExistException;
 import com.example.exception.InvalidPasswordException;
 import com.example.exception.InvalidTokenException;
 import com.example.exception.UserNotFoundException;
 import com.example.mapper.UserMapper;
-import com.example.repository.RevokedTokenRepository;
+import com.example.repository.jpa.RevokedTokenRepository;
 import com.example.service.interfaces.AuthService;
 import com.example.service.interfaces.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.repository.UserRepository;
+import com.example.repository.jpa.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyExistException("Email already exists");
+            throw new EmailAlreadyExistException();
         }
         userService.createUser(request, Role.UNDEFINED);
     }

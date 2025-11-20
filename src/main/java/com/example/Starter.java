@@ -4,7 +4,7 @@ import com.example.dto.TransformerDto;
 import com.example.dto.UserDto;
 import com.example.dto.request.*;
 
-import com.example.entity.Role;
+import com.example.entity.postgres.Role;
 import com.example.exception.InvalidPasswordException;
 import com.example.model.Transformer;
 import com.example.service.impl.AdminServiceImpl;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.Scanner;
 
-@Component
 public class Starter implements CommandLineRunner {
 
     private final UserService userService;

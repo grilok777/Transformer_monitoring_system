@@ -1,9 +1,9 @@
-package com.example.entity;
+package com.example.entity.postgres;
 
-public enum Role{
+public enum Role {
     ADMIN,
     OPERATOR,
     DATA_ANALYST,
     CREATOR,
     UNDEFINED
-    }
+}

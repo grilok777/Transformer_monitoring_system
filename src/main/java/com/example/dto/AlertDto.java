@@ -1,6 +1,6 @@
 package com.example.dto;
 
-import com.example.model.AlertLevel;
+import com.example.entity.mongo.AlertLevel;
 
 public record AlertDto(
         Long id,
@@ -10,17 +10,5 @@ public record AlertDto(
         Double temperature,
         Double voltage,
         String timestamp,
-        int problemResolved
-) {
-    @Override
-    public String toString() {
-        return "{id}=" + id +
-                " {transformerId}=" + transformerId +
-                " {level}=" + level +
-                " {description}=" + message +
-                " {temperature}=" + temperature +
-                " {voltage}=" + voltage +
-                " {timestamp}=" + timestamp +
-                " {resolved}=" + problemResolved;
-    }
-}
+        Boolean problemResolved
+) {}

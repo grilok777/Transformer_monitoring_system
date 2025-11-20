@@ -1,0 +1,14 @@
+simulation:
+  steel-loss: 2.0
+  copper-loss-nominal: 10.5
+
+  load-min: 0.788
+  load-max: 0.876
+
+  ambient-min: 20.0
+  ambient-max: 40.0
+
+  thermal-resistance: 7.0
+
+  initial-delay-sec: 5
+  period-sec: 5

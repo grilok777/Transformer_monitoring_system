@@ -1,7 +1,7 @@
-package com.example.repository;
+package com.example.repository.jpa;
 
-import com.example.entity.Role;
-import com.example.entity.User;
+import com.example.entity.postgres.Role;
+import com.example.entity.postgres.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

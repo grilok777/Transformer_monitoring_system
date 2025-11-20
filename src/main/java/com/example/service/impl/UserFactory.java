@@ -1,7 +1,8 @@
 package com.example.service.impl;
 
 import com.example.dto.request.RegisterRequest;
-import com.example.entity.*;
+import com.example.entity.postgres.Role;
+import com.example.entity.postgres.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

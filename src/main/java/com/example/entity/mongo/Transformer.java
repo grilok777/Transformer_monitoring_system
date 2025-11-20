@@ -1,7 +1,9 @@
-package com.example.model;
+package com.example.entity.mongo;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,12 +12,14 @@ import java.util.List;
 import java.util.Map;
 
 @Document(collection = "Transformers")
-@Setter
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Transformer {
 
     @Id
-    private Long id; //Long
+    private Long id;  // ← ПОВИННО бути Long
 
     private String manufacturer;
 
@@ -39,10 +43,8 @@ public class Transformer {
 
     private Double currentVoltage;
 
-    private TransformerStatus status = TransformerStatus.NORMAL;
+    private TransformerStatus status;
 
     private List<Map<String, Object>> dataLogs = new ArrayList<>();
-
-    public Transformer() {}
 
 }

@@ -1,4 +1,4 @@
-package com.example.entity;
+package com.example.entity.postgres;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,12 +9,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class RevokedToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String token;
+
     private LocalDateTime revokedAt;
 
     public RevokedToken(String token, LocalDateTime revokedAt) {

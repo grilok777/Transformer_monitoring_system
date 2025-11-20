@@ -1,6 +1,6 @@
 package com.example.service.impl;
 
-import com.example.repository.RevokedTokenRepository;
+import com.example.repository.jpa.RevokedTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

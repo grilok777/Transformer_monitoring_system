@@ -1,7 +1,7 @@
 package com.example.service.interfaces;
 
 import com.example.dto.UserDto;
-import com.example.entity.Role;
+import com.example.entity.postgres.Role;
 
 import java.util.List;
 import java.util.Optional;

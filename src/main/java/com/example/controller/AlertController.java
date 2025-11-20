@@ -1,26 +1,31 @@
 package com.example.controller;
 
-import com.example.model.Alert;
-import com.example.service.impl.AlertService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dto.AlertDto;
+import com.example.entity.mongo.Alert;
+import com.example.service.interfaces.AlertService;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/alerts")
+@RequestMapping("api/alerts")
+@AllArgsConstructor
 public class AlertController {
 
-    @Autowired
-    private AlertService service;
+    private final AlertService alertService;
 
-    @PostMapping
+    // треба бути створити
+    // CreateAlertRequest (DTO)
+    // по аналогії з RegisterRequest
+
+    @PostMapping("/create")
     public Alert create(@RequestBody Alert alert) {
-        return service.create(alert);
+        return alertService.create(alert);
     }
 
     @GetMapping("/active")
-    public List<Alert> active() {
-        return service.getActiveAlerts();
+    public List<AlertDto> active() {
+        return alertService.getActiveAlerts();
     }
 }

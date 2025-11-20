@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.entity.User;
+import com.example.entity.postgres.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

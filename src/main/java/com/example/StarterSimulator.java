@@ -1,58 +1,8 @@
 package com.example;
 
-import com.example.model.Transformer;
+import com.example.entity.mongo.Transformer;
 import com.example.repository.mongo.TransformerRepository;
-import com.example.service.impl.SimulatorService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
-import java.util.List;
-
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class StarterSimulator {
-
-    private final TransformerRepository transformerRepository;
-    private final SimulatorService simulatorService;
-
-    @PostConstruct
-    public void init() {
-        new Thread(this::startActiveTransformers).start();
-    }
-
-    private void startActiveTransformers() {
-        try {
-            Thread.sleep(2000); // даємо Spring і Mongo повністю стартувати
-        } catch (InterruptedException ignored) {}
-
-        log.info("Searching for active transformers...");
-
-        List<Transformer> transformers = transformerRepository.findAll();
-
-        if (transformers.isEmpty()) {
-            log.warn("No transformers found in DB. Nothing to simulate.");
-            return;
-        }
-
-        transformers.stream()
-                .filter(t -> Boolean.TRUE.equals(t.getTransformerCondition()))
-                .forEach(t -> {
-                    log.info("Starting simulation for transformer ID {}", t.getId());
-                    simulatorService.startSimulation(t.getId());//Long.valueOf(
-                });
-
-        log.info("All active transformers started.");
-    }
-}
-
-/*package com.example;
-
-import com.example.model.Transformer;
-import com.example.repository.mongo.TransformerRepository;
-import com.example.service.impl.SimulatorService;
+import com.example.service.interfaces.SimulatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -88,4 +38,4 @@ public class StarterSimulator {
 
         log.info("All active transformers started.");
     }
-}*/
+}
