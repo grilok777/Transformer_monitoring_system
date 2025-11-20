@@ -50,7 +50,7 @@ public class SimulatorService {
 
         executor.scheduleAtFixedRate(
                 () -> simulateStep(transformerId),
-                5, 20, TimeUnit.SECONDS //240
+                5, 240, TimeUnit.SECONDS //240
         );
 
         log.info("Simulation started for transformer {}", transformerId);

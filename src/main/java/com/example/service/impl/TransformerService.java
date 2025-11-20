@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.example.dto.request.TransformerRequest;
 import com.example.model.Transformer;
 import com.example.model.TransformerStatus;
 import com.example.repository.mongo.TransformerRepository;
@@ -93,5 +94,49 @@ public class TransformerService {
 
         repository.save(transformer);
 
+    }
+
+    public Transformer create(TransformerRequest request) {
+        Transformer t = new Transformer();
+        Long newId = getNextId();
+
+        t.setId(newId);
+        t.setManufacturer(request.manufacturer());
+        t.setModelType(request.modelType());
+        t.setRatedPowerKVA(request.ratedPowerKVA());
+        t.setPrimaryVoltageKV(request.primaryVoltageKV());
+        t.setSecondaryVoltageKV(request.secondaryVoltageKV());
+        t.setFrequencyHz(request.frequencyHz());
+        t.setTransformerCondition(request.transformerCondition());
+        t.setRemoteMonitoring(request.remoteMonitoring());
+
+        return repository.save(t);
+    }
+
+    public Transformer update(Long id, TransformerRequest request) {
+        Transformer t = repository.findById(id).orElseThrow();
+
+        if (request.manufacturer() != null) t.setManufacturer(request.manufacturer());
+        if (request.modelType() != null) t.setModelType(request.modelType());
+        if (request.ratedPowerKVA() != null) t.setRatedPowerKVA(request.ratedPowerKVA());
+        if (request.primaryVoltageKV() != null) t.setPrimaryVoltageKV(request.primaryVoltageKV());
+        if (request.secondaryVoltageKV() != null) t.setSecondaryVoltageKV(request.secondaryVoltageKV());
+        if (request.frequencyHz() != null) t.setFrequencyHz(request.frequencyHz());
+        if (request.transformerCondition() != null) t.setTransformerCondition(request.transformerCondition());
+
+        return repository.save(t);
+    }
+
+    public void deactivate(Long id) {
+        Transformer t = repository.findById(id).orElseThrow();
+        t.setTransformerCondition(false);
+        repository.save(t);
+    }
+
+    private Long getNextId() {
+        return repository.findTopByOrderByIdDesc()
+                .map(t -> t.getId())
+                .map(id -> id + 1)                            // +1 коректно
+                .orElse(1L);
     }
 }

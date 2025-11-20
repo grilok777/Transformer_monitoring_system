@@ -81,4 +81,9 @@ public class AlertService {
         // Зберігаємо назад
         return repository.save(alert);
     }
+
+
+    public List<Alert> findAll() {
+        return repository.findAll(); // ← Реалізація
+    }
 }

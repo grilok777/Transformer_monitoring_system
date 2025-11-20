@@ -7,9 +7,11 @@ import com.example.dto.request.*;
 import com.example.entity.Role;
 import com.example.exception.InvalidPasswordException;
 import com.example.model.Transformer;
+import com.example.service.impl.AdminServiceImpl;
 import com.example.service.impl.OperatorServiceImpl;
 import com.example.service.interfaces.AuthService;
 import com.example.service.impl.CreatorServiceImpl;
+import com.example.service.impl.DataAnalystServiceImpl;
 
 import com.example.service.interfaces.UserService;
 import org.springframework.boot.CommandLineRunner;
@@ -27,12 +29,16 @@ public class Starter implements CommandLineRunner {
     private String currentToken;
     private final Scanner scanner = new Scanner(System.in);
     private final OperatorServiceImpl operatorService;
+    private final DataAnalystServiceImpl dataAnalystService;
+    private final AdminServiceImpl adminService;
 
-    public Starter(UserService userService, AuthService authService, CreatorServiceImpl creatorService, OperatorServiceImpl operatorService) {
+    public Starter(UserService userService, AuthService authService, CreatorServiceImpl creatorService, OperatorServiceImpl operatorService, DataAnalystServiceImpl dataAnalystService, AdminServiceImpl adminService) {
         this.userService = userService;
         this.authService = authService;
         this.creatorService = creatorService;
         this.operatorService = operatorService;
+        this.dataAnalystService = dataAnalystService;
+        this.adminService = adminService;
     }
 
     @Override
@@ -49,10 +55,28 @@ public class Starter implements CommandLineRunner {
                 case 5 -> setNewName();
                 case 6 -> showUsers();
                 case 7 -> setNewRole();
+
                 case 8 -> showAllTransformers();
                 case 9 -> showTransformerById();
                 case 10 -> showTransformerAlerts();
                 case 11 -> processTransformerError();
+
+                case 12 -> exportSingleTransformer();
+                case 13 -> exportTransformersRange();
+                case 14 -> exportAllTransformers();
+                case 15 -> viewAllErrors();
+                case 16 -> viewCriticalAlerts();
+                case 17 -> exportLogs();
+
+                case 18 -> adminCreateTransformer();
+                case 19 -> adminUpdateTransformer();
+                case 20 -> adminDeactivateTransformer();
+                case 21 -> adminExportTransformer();
+                case 22 -> adminExportRange();
+                case 23 -> adminExportAll();
+                case 24 -> adminShowAllErrors();
+                case 25 -> adminShowCriticalErrors();
+                case 26 -> adminExportLogs();
                 case 0 -> {
                     System.out.println("Exiting...");
                     return;
@@ -107,10 +131,30 @@ public class Starter implements CommandLineRunner {
         System.out.println("6. Show users");
         System.out.println("7. Change role");
 
+        System.out.println("Operator");
         System.out.println("8. Show all transformers");
         System.out.println("9. Show transformer by ID");
         System.out.println("10. Show transformer alerts");
         System.out.println("11. Process transformer error");
+
+        System.out.println("Data analyst");
+        System.out.println("12. Export transformer");
+        System.out.println("13. Export transformers range");
+        System.out.println("14. Export all transformers");
+        System.out.println("15. View all errors");
+        System.out.println("16. View critical alerts");
+        System.out.println("17. Export logs");
+
+        System.out.println("Admin");
+        System.out.println("18. Create transformer");
+        System.out.println("19. Update transformer");
+        System.out.println("20. Deactivate transformer");
+        System.out.println("21. Export transformer by ID");
+        System.out.println("22. Export transformer range (FROM..TO)");
+        System.out.println("23. Export all transformers");
+        System.out.println("24. View all errors");
+        System.out.println("25. View critical alerts");
+        System.out.println("26. Export transformer logs");
 
         System.out.println("0. Exit");
         System.out.print("Your choice: ");
@@ -280,7 +324,7 @@ public class Starter implements CommandLineRunner {
     }
 
     private void processTransformerError() {
-        System.out.print("Enter transformer ID: ");
+        System.out.print("Enter alert ID: ");
         String id = scanner.nextLine().trim();
         try {
             operatorService.addErrorProcessing(Long.valueOf(id));//Long.valueOf(id)
@@ -288,5 +332,205 @@ public class Starter implements CommandLineRunner {
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    private void exportSingleTransformer() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine().trim());
+
+        try {
+            TransformerDto dto = dataAnalystService.exportTransformer(id);
+            System.out.println(dto);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void exportTransformersRange() {
+        System.out.print("From ID: ");
+        Long from = Long.valueOf(scanner.nextLine().trim());
+
+        System.out.print("To ID: ");
+        Long to = Long.valueOf(scanner.nextLine().trim());
+
+        var list = dataAnalystService.exportTransformersRange(from, to);
+
+        if (list.isEmpty()) {
+            System.out.println("No transformers found.");
+        }
+
+        list.forEach(System.out::println);
+    }
+
+    private void exportAllTransformers() {
+        var list = dataAnalystService.exportAllTransformers();
+
+        if (list.isEmpty()) {
+            System.out.println("No transformers found.");
+            return;
+        }
+
+        list.forEach(System.out::println);
+    }
+
+    private void viewAllErrors() {
+        var alerts = dataAnalystService.getAllErrors();
+
+        if (alerts.isEmpty()) {
+            System.out.println("No alerts found.");
+            return;
+        }
+
+        alerts.forEach(System.out::println);
+    }
+
+    private void viewCriticalAlerts() {
+        var alerts = dataAnalystService.getCriticalAlerts();
+
+        if (alerts.isEmpty()) {
+            System.out.println("No critical alerts found.");
+            return;
+        }
+
+        alerts.forEach(System.out::println);
+    }
+
+    private void exportLogs() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine().trim());
+
+        var logs = dataAnalystService.exportTransformerLogs(id);
+
+        if (logs.isEmpty()) {
+            System.out.println("No logs found.");
+            return;
+        }
+
+        logs.forEach(System.out::println);
+    }
+
+    private void adminCreateTransformer() {
+        System.out.println("\n=== CREATE TRANSFORMER ===");
+
+        System.out.print("Manufacturer: ");
+        String manufacturer = scanner.nextLine();
+
+        System.out.print("Model Type: ");
+        String modelType = scanner.nextLine();
+
+        System.out.print("Rated Power (kVA): ");
+        Double ratedPowerKVA = Double.valueOf(scanner.nextLine());
+
+        System.out.print("Primary Voltage (kV): ");
+        Integer primaryKV = Integer.valueOf(scanner.nextLine());
+
+        System.out.print("Secondary Voltage (kV): ");
+        Integer secondaryKV = Integer.valueOf(scanner.nextLine());
+
+        System.out.print("Frequency (Hz): ");
+        Double frequencyHz = Double.valueOf(scanner.nextLine());
+
+        TransformerRequest request = new TransformerRequest(
+                manufacturer,
+                modelType,
+                ratedPowerKVA,
+                primaryKV,
+                secondaryKV,
+                frequencyHz,
+                Boolean.TRUE,
+                Boolean.FALSE
+        );
+
+        TransformerDto dto = adminService.createTransformer(request);
+
+        System.out.println("\nTransformer created:");
+        System.out.println(dto);
+    }
+
+    private void adminUpdateTransformer() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine());
+
+        System.out.print("New Manufacturer: ");
+        String manufacturer = scanner.nextLine();
+
+        System.out.print("New Model Type: ");
+        String modelType = scanner.nextLine();
+
+        System.out.print("New Rated Power (kVA): ");
+        Double ratedPowerKVA = Double.valueOf(scanner.nextLine());
+
+        System.out.print("New Primary Voltage (kV): ");
+        Integer primaryKV = Integer.valueOf(scanner.nextLine());
+
+        System.out.print("New Secondary Voltage (kV): ");
+        Integer secondaryKV = Integer.valueOf(scanner.nextLine());
+
+        System.out.print("New Frequency (Hz): ");
+        Double frequencyHz = Double.valueOf(scanner.nextLine());
+
+        TransformerRequest request = new TransformerRequest(
+                manufacturer,
+                modelType,
+                ratedPowerKVA,
+                primaryKV,
+                secondaryKV,
+                frequencyHz,
+                Boolean.TRUE,
+                Boolean.FALSE
+        );
+
+        TransformerDto dto = adminService.updateTransformer(id, request);
+
+        System.out.println("\nUpdated transformer:");
+        System.out.println(dto);
+    }
+
+    private void adminDeactivateTransformer() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine());
+
+        adminService.deactivateTransformer(id);
+        System.out.println("Transformer deactivated.");
+    }
+
+    private void adminExportTransformer() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine());
+
+        System.out.println(adminService.exportTransformer(id));
+    }
+
+    private void adminExportRange() {
+        System.out.print("From ID: ");
+        Long from = Long.valueOf(scanner.nextLine());
+
+        System.out.print("To ID: ");
+        Long to = Long.valueOf(scanner.nextLine());
+
+        adminService.exportTransformersRange(from, to)
+                .forEach(System.out::println);
+    }
+
+    private void adminExportAll() {
+        adminService.exportAllTransformers()
+                .forEach(System.out::println);
+    }
+
+    private void adminShowAllErrors() {
+        adminService.getAllErrors()
+                .forEach(System.out::println);
+    }
+    private void adminShowCriticalErrors() {
+        adminService.getCriticalAlerts()
+                .forEach(System.out::println);
+    }
+
+    private void adminExportLogs() {
+        System.out.print("Enter transformer ID: ");
+        Long id = Long.valueOf(scanner.nextLine());
+
+        adminService.exportTransformerLogs(id)
+                .forEach(System.out::println);
     }
 }
