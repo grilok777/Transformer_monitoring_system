@@ -1,7 +1,7 @@
-package com.example.service.impl;
+/*package com.example.service.impl;
 
-import com.example.model.Alert;
-import com.example.model.AlertLevel;
+import com.example.entity.mongo.Alert;
+import com.example.entity.mongo.AlertLevel;
 import com.example.repository.mongo.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,4 +86,4 @@ public class AlertService {
     public List<Alert> findAll() {
         return repository.findAll(); // ← Реалізація
     }
-}
+}*/

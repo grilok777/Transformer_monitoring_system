@@ -8,13 +8,16 @@ import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/analyst")
+@RequestMapping("/api/analyst")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+@PreAuthorize("hasRole('DATA_ANALYST')")
 public class DataAnalystController {
     //@Qualifier("dataAnalystServiceImpl")
     private final DataAnalystService analystService;

@@ -4,14 +4,15 @@ import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import com.example.service.interfaces.OperatorService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/operator") // є питання
-//@CrossOrigin(origins = "*")
-//@PreAuthorize("hasAnyRole('OPERATOR', 'ADMIN', 'DATA_ANALYST')")
+@RequestMapping("/api/operator") // є питання
+@CrossOrigin(origins = "*")
+@PreAuthorize("hasRole('OPERATOR')")
 @AllArgsConstructor
 public class OperatorController {
 
@@ -27,12 +28,12 @@ public class OperatorController {
         return operatorService.getTransformerStatus(id);
     }
 
-//    @PostMapping("/transformers/{id}/process-error")
-//    public AlertDto processError(
-//            @PathVariable Long id//Long
-//    ) {
-//        return operatorService.addErrorProcessing(id);
-//    }
+    @PostMapping("/transformers/{id}/process-error")
+    public AlertDto processError(
+            @PathVariable Long id//Long
+    ) {
+        return operatorService.addErrorProcessing(id);
+    }
 
     @GetMapping("/transformers/{id}/alerts")
     public List<AlertDto> getAlerts(@PathVariable Long id) {

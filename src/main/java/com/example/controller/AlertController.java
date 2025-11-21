@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.AlertDto;
+import com.example.dto.request.AlertRequest;
 import com.example.entity.mongo.Alert;
 import com.example.service.interfaces.AlertService;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,8 @@ public class AlertController {
     // по аналогії з RegisterRequest
 
     @PostMapping("/create")
-    public Alert create(@RequestBody Alert alert) {
-        return alertService.create(alert);
+    public Alert create(@RequestBody AlertRequest request ) {
+        return alertService.create(request);
     }
 
     @GetMapping("/active")

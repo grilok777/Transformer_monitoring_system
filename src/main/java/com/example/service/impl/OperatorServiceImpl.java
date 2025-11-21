@@ -36,27 +36,27 @@ public class OperatorServiceImpl implements OperatorService {
                 .orElseThrow(() -> new RuntimeException("Трансформатор не знайдено"));
     }
 
+    //@Override
+    //public List<AlertDto> getTransformerAlerts(Long id) {
+    //    return List.of();
+    //}
+//
+    //@Override
+    //public AlertDto addErrorProcessing(Long transformerId) {
+    //    return null;
+    //}
+
     @Override
     public List<AlertDto> getTransformerAlerts(Long id) {
-        return List.of();
+        return alertService.getAlertsByTransformerId(id)
+                .stream()
+                .map(AlertMapper::toDto)
+                .toList();
     }
-
     @Override
-    public AlertDto addErrorProcessing(Long transformerId) {
+    public AlertDto addErrorProcessing(Long transformerId) {//String
+        // оператор залишає коментар до існуючої помилки
+        alertService.createOperatorNote(transformerId);
         return null;
     }
-
-//    @Override
-//    public List<AlertDto> getTransformerAlerts(Long id) {
-//        return alertService.getAlertsByTransformerId(id)
-//                .stream()
-//                .map(AlertMapper::toDto)
-//                .toList();
-//    }
-//    @Override
-//    public AlertDto addErrorProcessing(Long transformerId) {//String
-//        // оператор залишає коментар до існуючої помилки
-//        alertService.createOperatorNote(transformerId);
-//        return null;
-//    }
 }

@@ -1,11 +1,13 @@
-package com.example.service.impl;
+/*package com.example.service.impl;
 
 import com.example.dto.request.TransformerRequest;
-import com.example.model.Transformer;
-import com.example.model.TransformerStatus;
+import com.example.entity.mongo.Transformer;
+import com.example.entity.mongo.TransformerStatus;
 import com.example.repository.mongo.TransformerRepository;
 
-import com.example.model.AlertLevel;
+
+import com.example.entity.mongo.AlertLevel;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +15,21 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@AllArgsConstructor
 public class TransformerService {
 
-    @Autowired
+    //@Autowired
     private TransformerRepository repository;
-    private AlertService serviceA;
+    private AlertServiceImpl serviceA;
     private List<Map<String, Object>> dataLogs = new ArrayList<>();
-
+/*
     @Autowired
     public TransformerService(TransformerRepository repository, AlertService serviceA) {
         this.repository = repository;
         this.serviceA = serviceA;
-    }
+    }*/
 
-    public Optional<Transformer> getById(Long id) {
+    /*public Optional<Transformer> getById(Long id) {
         return repository.findById(id);
     }
 
@@ -139,4 +142,4 @@ public class TransformerService {
                 .map(id -> id + 1)                            // +1 коректно
                 .orElse(1L);
     }
-}
+}*/

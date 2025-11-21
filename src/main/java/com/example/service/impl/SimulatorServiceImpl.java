@@ -45,7 +45,7 @@ public class SimulatorServiceImpl implements SimulatorService {
 
         executor.scheduleAtFixedRate(
                 () -> simulateStep(transformerId),
-                5, 240, TimeUnit.SECONDS //240
+                5, 20, TimeUnit.SECONDS //240
         );
 
         log.info("Simulation started for transformer {}", transformerId);
@@ -66,7 +66,7 @@ public class SimulatorServiceImpl implements SimulatorService {
 
             double voltage = (power / currentAmpere) * loadFactor;
 
-            transformerService.updateStatus(transformerId, temperature, voltage);
+            //transformerService.updateStatus(transformerId, temperature, voltage);
             transformerService.updateData(transformerId, power, temperature, voltage);
 
             log.info(

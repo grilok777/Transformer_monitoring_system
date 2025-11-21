@@ -4,28 +4,22 @@ import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import com.example.mapper.AlertMapper;
 import com.example.mapper.TransformerMapper;
-import com.example.model.AlertLevel;
+import com.example.entity.mongo.AlertLevel;
 import com.example.service.interfaces.DataAnalystService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class DataAnalystServiceImpl implements DataAnalystService {
 
     private final OperatorServiceImpl operatorService;
-    private final TransformerService transformerService;
-    private final AlertService alertService;
+    private final TransformerServiceImpl transformerService;
+    private final AlertServiceImpl alertService;
 
-    public DataAnalystServiceImpl(
-            OperatorServiceImpl operatorService,
-            TransformerService transformerService,
-            AlertService alertService) {
 
-        this.operatorService = operatorService;
-        this.transformerService = transformerService;
-        this.alertService = alertService;
-    }
 
     @Override
     public TransformerDto exportTransformer(Long id) {
