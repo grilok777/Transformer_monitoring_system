@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">TransformMonitorApp</string>
+    <string name="register">Реєстрація</string>
+    <string name="fullname">Повне ім`я</string>
+    <string name="email">Email</string>
+    <string name="password">Пароль</string>
+    <string name="login">Увійти</string>
+    <string name="AlreadyHaveAccount">Маєте акаунт? Увійти</string>
+    <string name="logout">Вихід</string>
 </resources>
