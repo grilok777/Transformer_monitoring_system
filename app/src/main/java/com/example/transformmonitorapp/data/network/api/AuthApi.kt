@@ -2,9 +2,11 @@ package com.example.transformmonitorapp.data.network.api
 
 import com.example.transformmonitorapp.domain.dto.request.LoginRequest
 import com.example.transformmonitorapp.domain.dto.request.LogoutRequest
+import com.example.transformmonitorapp.domain.dto.request.RefreshTokenRequest
 import com.example.transformmonitorapp.domain.dto.request.RegisterRequest
 import com.example.transformmonitorapp.domain.dto.response.JwtResponse
 import com.example.transformmonitorapp.domain.dto.response.MessageResponse
+import com.example.transformmonitorapp.domain.dto.response.RefreshTokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,6 +23,9 @@ interface AuthApi {
     @POST("/api/auth/logout")
     suspend fun logout(@Body request: LogoutRequest): Response<MessageResponse>
 
-    @GET("ping")
+    @GET("api/auth/ping")
     suspend fun ping(): Response<Unit>
+
+    @POST("/api/auth/refresh")
+    suspend fun refreshToken(@Body req: RefreshTokenRequest): Response<RefreshTokenResponse>
 }

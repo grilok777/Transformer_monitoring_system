@@ -1,29 +1,58 @@
 package com.example.transformmonitorapp.data.network
 
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.transformmonitorapp.data.network.api.AuthApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.transformmonitorapp.utils.Constants.BASE_URL
-import kotlin.getValue
-
 
 object RetrofitClient {
 
-    private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
+    private var retrofit: Retrofit? = null
 
-    private val client = OkHttpClient.Builder()
-        .addInterceptor(logging)
-        // .addInterceptor(AuthInterceptor()) // можна додати токен
-        .build()
+    fun getClient(context: Context): Retrofit {
+        if (retrofit != null) return retrofit!!
 
-    val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
+        // Encrypted prefs
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val prefs = EncryptedSharedPreferences.create(
+            context,
+            "secure_app_prefs",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        val tokenManager = TokenManager(prefs)
+
+        // Базовий Retrofit для refresh
+        val authRetrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val authApi = authRetrofit.create(AuthApi::class.java)
+
+        val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .addInterceptor(AuthInterceptor(tokenManager, authApi))
+            .build()
+
+        retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
+        return retrofit!!
     }
 }

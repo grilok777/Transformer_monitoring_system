@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.transformmonitorapp.R
 import com.example.transformmonitorapp.data.network.ApiServiceProvider
+import com.example.transformmonitorapp.data.repository.impl.AuthRepositoryImpl
+import com.example.transformmonitorapp.data.repository.interfaces.AuthRepository
 import com.example.transformmonitorapp.ui.register.RegisterActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +23,8 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         lifecycleScope.launch {
-            val serverAvailable = checkServerConnection()
+            val authRepository = AuthRepositoryImpl(applicationContext)
+            val serverAvailable = checkServerConnection(authRepository)
 
             if (serverAvailable) {
                 startActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
@@ -36,10 +39,10 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun checkServerConnection(): Boolean {
+    private suspend fun checkServerConnection(authRepository: AuthRepository): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                val response = ApiServiceProvider.authApi.ping()
+                val response = authRepository.pingUser()
                 response.isSuccessful
             } catch (e: Exception) {
                 e.printStackTrace()

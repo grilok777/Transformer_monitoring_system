@@ -18,7 +18,7 @@ import com.example.transformmonitorapp.views.factories.LoginViewModelFactory
 class LoginActivity : AppCompatActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels {
-        LoginViewModelFactory(application, AuthRepositoryImpl())
+        LoginViewModelFactory(application, AuthRepositoryImpl(application))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +54,13 @@ class LoginActivity : AppCompatActivity() {
             if (response?.isSuccessful == true) {
                 val body = response.body()
                 if (body != null) {
-                    loginViewModel.saveUserData(body.token, body.userDto)
+
+                    loginViewModel.saveUserData(
+                        body.accessToken,
+                        body.refreshToken,
+                        body.userDto
+                    )
+
                     Toast.makeText(this, "Успішний вхід!", Toast.LENGTH_SHORT).show()
 
                     val roleNavigator = RoleNavigator(this)
@@ -66,6 +72,5 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Невірний email або пароль", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 }

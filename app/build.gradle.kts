@@ -25,6 +25,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        buildFeatures{
+            viewBinding = true
+        }
     }
 
     compileOptions {
@@ -57,6 +60,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha03")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")

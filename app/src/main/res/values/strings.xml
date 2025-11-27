@@ -7,4 +7,16 @@
     <string name="login">Увійти</string>
     <string name="AlreadyHaveAccount">Маєте акаунт? Увійти</string>
     <string name="logout">Вихід</string>
+    <string name="wait">Завантаження…</string>
+    <string name="change">Змінити</string>
+    <string name="set">Змінити</string>
+    <string name="hello_user">Привіт користувач (Роль невідома)</string>
+    <string name="token_missing">Токен втрачено</string>
+    <string name="profile_in_progress">Профіль в розробці</string>
+    <string name="logged_out_success">Успішний вихід. До зустрічі!</string>
+    <string name="logout_failed">Невдалий вихід</string>
+    <string name="all_users">Користувачі</string>
+    <string name="admins">Адміністратори</string>
+    <string name="search">Пошук користувачів</string>
+    <string name="profile">Профіль</string>
 </resources>

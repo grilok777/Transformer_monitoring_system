@@ -1,74 +1,91 @@
 //package com.example.transformmonitorapp.ui.home.role
 //
-//import android.annotation.SuppressLint
+//import com.example.transformmonitorapp.views.models.CreatorViewModel
+//import GenericViewModelFactory
 //import android.os.Bundle
-//import android.widget.LinearLayout
-//import android.widget.TextView
+//import android.widget.Button
+//import android.widget.EditText
 //import android.widget.Toast
 //import androidx.activity.viewModels
-//import androidx.appcompat.app.AppCompatActivity
+//import androidx.core.view.GravityCompat
+//import androidx.recyclerview.widget.LinearLayoutManager
+//import androidx.recyclerview.widget.RecyclerView
 //import com.example.transformmonitorapp.R
-//import com.example.transformmonitorapp.data.network.ApiServiceProvider
 //import com.example.transformmonitorapp.data.repository.impl.CreatorRepositoryImpl
-//import com.example.transformmonitorapp.domain.dto.UserDto
-//import com.example.transformmonitorapp.views.factories.CreatorViewModelFactory
-//import com.example.transformmonitorapp.views.models.CreatorViewModel
+//import com.example.transformmonitorapp.views.adapters.MenuAdapter
+//import com.example.transformmonitorapp.views.adapters.MenuItem
+//import com.example.transformmonitorapp.views.adapters.UserAdapter
 //
-//class CreatorActivity : AppCompatActivity() {
+//class CreatorActivity : RoleActivity() {
 //
-//    private val viewModel: CreatorViewModel by viewModels {
-//        CreatorViewModelFactory(
-//            application,
-//            CreatorRepositoryImpl(ApiServiceProvider.creatorApi)
-//        )
+//    val token = pref
+//        private val viewModel: CreatorViewModel by viewModels {
+//        GenericViewModelFactory {
+//            CreatorViewModel(application, CreatorRepositoryImpl(applicationContext, token))
+//        }
 //    }
+//
+//
+//    private lateinit var userAdapter: UserAdapter
+//    private lateinit var rvUsers: RecyclerView
+//
+//    override fun getLayoutId(): Int = R.layout.activity_creator
 //
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_creator)
-//
-//        val tvUserName = findViewById<TextView>(R.id.tvUserName)
-//        tvUserName.text = "Привіт, Creator!"
-//
-//        val roleContainer = findViewById<LinearLayout>(R.id.roleContentContainer)
-//        viewModel.users.observe(this) { users ->
-//            roleContainer.removeAllViews()
-//            users.forEach { user ->
-//                val tv = TextView(this)
-//                tv.text = "${user.nameUKR} (${user.email})"
-//                tv.textSize = 16f
-//                roleContainer.addView(tv)
-//            }
-//        }
-//    }
-//
-//
-//    private fun setupUI() {
-//        val title = findViewById<TextView>(R.id.baseTitle)
-//        title.text = "Creator Panel"
-//
-//        val userName = findViewById<TextView>(R.id.tvUserName)
-//        userName.text = "Loading users..."
+//        observeViewModel()
+//        setupRecyclerView()
 //    }
 //
 //    private fun observeViewModel() {
-//        viewModel.users.observe(this) { showUsers(it) }
-//        viewModel.error.observe(this) {
-//            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+//        viewModel.users.observe(this) { users ->
+//            if (::userAdapter.isInitialized) userAdapter.updateData(users)
+//        }
+//        viewModel.error.observe(this) { msg ->
+//            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 //        }
 //    }
 //
-//    @SuppressLint("SetTextI18n")
-//    private fun showUsers(users: List<UserDto>) {
-//        val container = findViewById<LinearLayout>(R.id.roleContentContainer)
-//        container.removeAllViews()
+//    override fun customizeAsideMenu() {
+//        fun menuAction(titleRes: Int, layoutRes: Int, action: (() -> Unit)? = null) = {
+//            header.tvTitle.setText(titleRes)
+//            setContentLayout(layoutRes)
+//            if (::rvUsers.isInitialized) setupRecyclerView()
+//            action?.invoke()
+//            drawerLayout.closeDrawer(GravityCompat.START)
+//        }
 //
-//        users.forEach { user ->
-//            val tv = TextView(this).apply {
-//                text = "${user.nameUKR} (${user.email})"
-//                textSize = 16f
+//        val menuItems = listOf(
+//            MenuItem(R.string.all_users, menuAction(R.string.all_users, R.layout.activity_creator) {
+//                viewModel.loadUsers()
+//            }),
+//            MenuItem(R.string.search, menuAction(R.string.search, R.layout.activity_search_user) {
+//                setupSearchView()
+//            })
+//        )
+//
+//        menuContainer.addView(
+//            RecyclerView(this).apply {
+//                layoutManager = LinearLayoutManager(this@CreatorActivity)
+//                adapter = MenuAdapter(menuItems)
 //            }
-//            container.addView(tv)
+//        )
+//    }
+//
+//    private fun setupRecyclerView() {
+//        rvUsers = findViewById(R.id.rvUsers)
+//        rvUsers.layoutManager = LinearLayoutManager(this)
+//        userAdapter = UserAdapter { user, newRole -> viewModel.changeRole(user.id, newRole) }
+//        rvUsers.adapter = userAdapter
+//    }
+//
+//    private fun setupSearchView() {
+//        val searchField = findViewById<EditText>(R.id.etSearchEmail)
+//        val btnSearch = findViewById<Button>(R.id.btnSearch)
+//
+//        btnSearch.setOnClickListener {
+//            val email = searchField.text.toString()
+//            viewModel.loadUserByEmail(email)
 //        }
 //    }
 //}
@@ -76,39 +93,88 @@ package com.example.transformmonitorapp.ui.home.role
 
 import GenericViewModelFactory
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.viewModels
-import com.example.transformmonitorapp.data.network.ApiServiceProvider
+import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.transformmonitorapp.R
 import com.example.transformmonitorapp.data.repository.impl.CreatorRepositoryImpl
+import com.example.transformmonitorapp.views.adapters.MenuAdapter
+import com.example.transformmonitorapp.views.adapters.MenuItem
+import com.example.transformmonitorapp.views.adapters.UserAdapter
 import com.example.transformmonitorapp.views.models.CreatorViewModel
 
 class CreatorActivity : RoleActivity() {
 
+    val token: String by lazy { homeViewModel.loadToken() ?: "" }
+
     private val viewModel: CreatorViewModel by viewModels {
-        GenericViewModelFactory {
-            val repository = CreatorRepositoryImpl(ApiServiceProvider.creatorApi)
-
-            CreatorViewModel(application, repository)
-        }
+        GenericViewModelFactory { CreatorViewModel(application, CreatorRepositoryImpl(applicationContext, token)) }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        val users = viewModel.loadUsers()
+    private lateinit var userAdapter: UserAdapter
+    private lateinit var rvUsers: RecyclerView
+
+    override fun getLayoutId(): Int = R.layout.activity_creator
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        observeViewModel()
+        setupRecyclerView()
     }
 
-    override fun setupUI() {
-        super.setupUI()
-        tvUserName.text = "Привіт, Creator!"
+    private fun observeViewModel() {
+        viewModel.users.observe(this) { users -> if (::userAdapter.isInitialized) userAdapter.updateData(users) }
+        viewModel.error.observe(this) { msg -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() }
     }
 
-    override fun observeViewModel() {
-        viewModel.error.observe(this) { showError(it) }
+    override fun customizeAsideMenu() {
+        val menuItems = listOf(
+            MenuItem(
+                titleRes = R.string.all_users,
+                action = { handleMenuAction(R.string.all_users, R.layout.activity_creator) { viewModel.loadUsers() } }
+            ),
+            MenuItem(
+                titleRes = R.string.search,
+                action = { handleMenuAction(R.string.search, R.layout.activity_search_user) { setupSearchView() } }
+            )
+        )
+
+        menuContainer.addView(
+            RecyclerView(this).apply {
+                layoutManager = LinearLayoutManager(this@CreatorActivity)
+                adapter = MenuAdapter(menuItems)
+            }
+        )
     }
 
-    override fun loadData() {
-        viewModel.loadUsers()
+    private fun handleMenuAction(titleRes: Int, layoutRes: Int, extraAction: (() -> Unit)? = null) {
+        header.tvTitle.setText(titleRes)
+        setContentLayout(layoutRes)
+        if (::rvUsers.isInitialized) setupRecyclerView()
+        extraAction?.invoke()
+        drawerLayout.closeDrawer(GravityCompat.START)
     }
-    fun showUsers(){
+
+    override fun navigateToProfile() {
+        setContentLayout(R.layout.activity_creator)
+
+        header.tvTitle.setText(R.string.profile)
+    }
+
+    private fun setupRecyclerView() {
+        rvUsers = findViewById(R.id.rvUsers)
+        rvUsers.layoutManager = LinearLayoutManager(this)
+        userAdapter = UserAdapter { user, newRole -> viewModel.changeRole(user.id, newRole) }
+        rvUsers.adapter = userAdapter
+    }
+
+    private fun setupSearchView() {
+        val searchField = findViewById<EditText>(R.id.etSearchEmail)
+        val btnSearch = findViewById<Button>(R.id.btnSearch)
+        btnSearch.setOnClickListener { viewModel.loadUserByEmail(searchField.text.toString()) }
     }
 }

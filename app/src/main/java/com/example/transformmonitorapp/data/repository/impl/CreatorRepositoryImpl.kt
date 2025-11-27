@@ -1,21 +1,27 @@
 package com.example.transformmonitorapp.data.repository.impl
 
-import com.example.transformmonitorapp.data.network.api.CreatorApi
+import android.content.Context
+import com.example.transformmonitorapp.data.network.ApiServiceProvider
 import com.example.transformmonitorapp.data.repository.interfaces.CreatorRepository
 import com.example.transformmonitorapp.domain.dto.UserDto
 import com.example.transformmonitorapp.domain.dto.response.MessageResponse
 import com.example.transformmonitorapp.domain.model.Role
 
-class CreatorRepositoryImpl(private val creatorApi: CreatorApi) : CreatorRepository {
+class CreatorRepositoryImpl(
+    context: Context,
+    private val token: String
+) : CreatorRepository {
+    private val api = ApiServiceProvider.creatorApi(context)
+
     override suspend fun getUsers(): List<UserDto> =
-        creatorApi.getAllUsers()
+        api.getAllUsers("Bearer $token")
 
     override suspend fun getUsersByRole(role: String): List<UserDto> =
-        creatorApi.getUsersByRole(role)
+        api.getUsersByRole(role, "Bearer $token")
 
     override suspend fun getUserByEmail(email: String): UserDto? =
-        creatorApi.getUserByEmail(email)
+        api.getUserByEmail(email, "Bearer $token")
 
     override suspend fun changeUserRole(id: Long, role: Role): MessageResponse =
-        creatorApi.changeUserRole(id, role)
+        api.changeUserRole(id, role, "Bearer $token")
 }

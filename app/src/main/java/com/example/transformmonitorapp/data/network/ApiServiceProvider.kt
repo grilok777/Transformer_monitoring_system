@@ -1,6 +1,6 @@
 package com.example.transformmonitorapp.data.network
 
-import com.example.transformmonitorapp.data.network.RetrofitClient.retrofit
+import android.content.Context
 import com.example.transformmonitorapp.data.network.api.AdminApi
 import com.example.transformmonitorapp.data.network.api.AnalystApi
 import com.example.transformmonitorapp.data.network.api.AuthApi
@@ -9,27 +9,22 @@ import com.example.transformmonitorapp.data.network.api.HomeApi
 import com.example.transformmonitorapp.data.network.api.OperatorApi
 
 object ApiServiceProvider {
-    val authApi: AuthApi by lazy {
-        retrofit.create(AuthApi::class.java)
-    }
 
-    val creatorApi: CreatorApi by lazy {
-        retrofit.create(CreatorApi::class.java)
-    }
+    fun authApi(context: Context): AuthApi =
+        RetrofitClient.getClient(context).create(AuthApi::class.java)
 
-    val adminApi: AdminApi by lazy {
-        retrofit.create(AdminApi::class.java)
-    }
+    fun creatorApi(context: Context): CreatorApi =
+        RetrofitClient.getClient(context).create(CreatorApi::class.java)
 
-    val operatorApi: OperatorApi by lazy {
-        retrofit.create(OperatorApi::class.java)
-    }
+    fun adminApi(context: Context): AdminApi =
+        RetrofitClient.getClient(context).create(AdminApi::class.java)
 
-    val dataAnalystApi: AnalystApi by lazy {
-        retrofit.create(AnalystApi::class.java)
-    }
+    fun operatorApi(context: Context): OperatorApi =
+        RetrofitClient.getClient(context).create(OperatorApi::class.java)
 
-    val homeApi : HomeApi by lazy {
-        retrofit.create(HomeApi::class.java)
-    }
+    fun analystApi(context: Context): AnalystApi =
+        RetrofitClient.getClient(context).create(AnalystApi::class.java)
+
+    fun homeApi(context: Context): HomeApi =
+        RetrofitClient.getClient(context).create(HomeApi::class.java)
 }

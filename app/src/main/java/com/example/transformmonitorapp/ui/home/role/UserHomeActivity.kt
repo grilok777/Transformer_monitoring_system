@@ -3,20 +3,19 @@ package com.example.transformmonitorapp.ui.home.role
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Bundle
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import com.example.transformmonitorapp.R
 
-class UserHomeActivity : AppCompatActivity() {
+class UserHomeActivity : RoleActivity() {
     lateinit var waitMessage: TextView
+
+    override fun getLayoutId(): Int = R.layout.activity_undefined
 
     @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_base_role)
 
-        val title = findViewById<TextView>(R.id.tvUserName)
+        val title = findViewById<TextView>(R.id.tvTitle)
         title.apply {
             text = "Отакої :("
             textSize = 24f
@@ -24,14 +23,19 @@ class UserHomeActivity : AppCompatActivity() {
             setTypeface(typeface, Typeface.BOLD)
         }
 
-        waitMessage = TextView(this).apply {
+        waitMessage = findViewById(R.id.errorMsg)
+
+        waitMessage.apply{
             text = "Будь ласка, зачекайте перевірку від модерації серверу"
             textSize = 18f
             setPadding(16, 16, 16, 16)
-
+            textAlignment = TextView.TEXT_ALIGNMENT_CENTER
         }
+    }
 
-        val container = findViewById<LinearLayout>(R.id.roleContentContainer)
-        container.addView(waitMessage)
+    override fun customizeAsideMenu() {
+    }
+
+    override fun navigateToProfile() {
     }
 }

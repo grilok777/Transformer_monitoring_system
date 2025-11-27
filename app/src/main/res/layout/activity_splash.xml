@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="#2196F3">
+    android:background="@color/secondaryColor">
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -15,7 +15,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading..."
+        android:text="@string/wait"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium" />

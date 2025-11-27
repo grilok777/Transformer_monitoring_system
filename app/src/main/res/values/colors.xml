@@ -4,6 +4,8 @@
     <color name="primaryLight">#BB86FC</color>
     <color name="secondaryColor">#16BAD1</color>
     <color name="buttonTextColor">#FFFFFF</color>
-    <color name="textColor">#000000</color>
+    <color name="textColor">#F1180456</color>
+    <color name="asideColor">#118FE9</color>
     <color name="inputBackground">#F0F0F0</color>
+
 </resources>

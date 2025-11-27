@@ -6,22 +6,29 @@ import com.example.transformmonitorapp.domain.model.Role
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PUT
-import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CreatorApi {
     @GET("/api/creator/users")
-    suspend fun getAllUsers(): List<UserDto>
+    suspend fun getAllUsers(@Header("Authorization") token: String): List<UserDto>
 
-    @GET("/api/users/by-role")
-    suspend fun getUsersByRole(@Query("role") role: String): List<UserDto>
+    @GET("/api/creator/users/by-role")
+    suspend fun getUsersByRole(
+        @Query("role") role: String,
+        @Header("Authorization") token: String
+    ): List<UserDto>
 
-    @GET("/api/users/by-email")
-    suspend fun getUserByEmail(@Query("email") email: String): UserDto?
+    @GET("/api/creator/users/by-email")
+    suspend fun getUserByEmail(
+        @Query("email") email: String,
+        @Header("Authorization") token: String
+    ): UserDto?
 
-    @PUT("/api/users/{id}/role")
+    @PUT("/api/creator/users/{id}/role")
     suspend fun changeUserRole(
-        @Part("id") id: Long,
-        @Query("role") role: Role
+        @Path("id") id: Long,
+        @Query("role") role: Role,
+        @Header("Authorization") token: String
     ): MessageResponse
 }

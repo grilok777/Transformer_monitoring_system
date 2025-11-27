@@ -19,7 +19,7 @@ import com.example.transformmonitorapp.views.models.RegisterViewModel
 class RegisterActivity : AppCompatActivity() {
 
     private val registerViewModel: RegisterViewModel by viewModels {
-        RegisterViewModelFactory(application, AuthRepositoryImpl())
+        RegisterViewModelFactory(application, AuthRepositoryImpl(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
