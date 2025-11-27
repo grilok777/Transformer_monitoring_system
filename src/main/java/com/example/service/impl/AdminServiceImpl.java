@@ -3,45 +3,65 @@ package com.example.service.impl;
 import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import com.example.dto.request.TransformerRequest;
+import com.example.entity.mongo.Transformer;
+import com.example.exception.TransformerNotFoundException;
 import com.example.mapper.AlertMapper;
 import com.example.mapper.TransformerMapper;
 import com.example.entity.mongo.AlertLevel;
 import com.example.service.interfaces.AdminService;
 
+import com.example.service.interfaces.AlertService;
+import com.example.service.interfaces.OperatorService;
+import com.example.service.interfaces.TransformerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.example.entity.mongo.Transformer;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    private final TransformerServiceImpl transformerService;
-    private final AlertServiceImpl alertService;
-    private final OperatorServiceImpl operatorService;
+    private final TransformerService transformerService;
+    private final AlertService alertService;
+    private final OperatorService operatorService;
 
 
     @Override
-    public TransformerDto createTransformer(TransformerRequest request) {
-        return TransformerMapper.toDto(transformerService.create(request));
-    }
+    public void updateTransformer(Long id, TransformerRequest request) {
 
-    @Override
-    public TransformerDto updateTransformer(Long id, TransformerRequest request) {
-        return TransformerMapper.toDto(transformerService.update(id, request));
+        Transformer existing = transformerService.getById(id)
+                .orElseThrow(TransformerNotFoundException::new);
+
+        Transformer updated = existing.toBuilder()
+                .manufacturer(request.manufacturer())
+                .modelType(request.modelType())
+                .ratedPowerKVA(request.ratedPowerKVA())
+                .primaryVoltageKV(request.primaryVoltageKV())
+                .secondaryVoltageKV(request.secondaryVoltageKV())
+                .frequencyHz(request.frequencyHz())
+                .transformerCondition(request.transformerCondition())
+                .remoteMonitoring(request.remoteMonitoring())
+                .build();
+
+        transformerService.save(updated);
     }
 
     @Override
     public void deactivateTransformer(Long id) {
-        transformerService.deactivate(id);
+        Transformer t = transformerService.getById(id)
+                .orElseThrow(TransformerNotFoundException::new);
+
+        Transformer updated = t.toBuilder()
+                .transformerCondition(false)  // деактивація = вимкнений
+                .build();
+
+        transformerService.save(updated);
     }
 
-    // --- Methods inherited from DataAnalystService ----
-
     @Override
-    public TransformerDto exportTransformer(Long id) {
-        return operatorService.getTransformerStatus(id);
+    public Optional<TransformerDto> exportTransformer(Long id) {
+        return operatorService.getTransformer(id);
     }
 
     @Override
@@ -54,8 +74,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<TransformerDto> exportAllTransformers() {
-        return operatorService.getAllTransformersStatus().stream()
-                .toList();
+        return operatorService.getAllTransformers().stream().toList();
     }
 
     @Override
@@ -76,11 +95,10 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<String> exportTransformerLogs(Long id) {
         return transformerService.getById(id)
-                .orElseThrow(() -> new RuntimeException("Трансформатор не знайдено"))
+                .orElseThrow(TransformerNotFoundException::new)
                 .getDataLogs()
                 .stream()
                 .map(Object::toString)
                 .toList();
     }
 }
-

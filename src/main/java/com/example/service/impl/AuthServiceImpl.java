@@ -1,9 +1,9 @@
 package com.example.service.impl;
 
 import com.example.config.CustomUserDetails;
-import com.example.dto.*;
 import com.example.dto.request.LoginRequest;
 import com.example.dto.request.LogoutRequest;
+import com.example.dto.request.RefreshTokenRequest;
 import com.example.dto.request.RegisterRequest;
 import com.example.dto.response.JwtResponse;
 import com.example.dto.response.MessageResponse;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import com.example.repository.jpa.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -47,31 +47,66 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public JwtResponse login(LoginRequest request) {
+        User user = userRepository.findUserByEmail(request.email())
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        String accessToken = jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15));
+        String refreshToken = jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30));
+
+        return new JwtResponse(
+                accessToken,
+                refreshToken,
+                UserMapper.fromUserToDto(user)
+        );
+    }
+
+    @Override
     public MessageResponse logout(LogoutRequest request) {
         String token = request.token();
         if (token == null || token.isBlank()) {
             throw new InvalidTokenException("Token is required for logout");
         }
 
-        if (revokedTokenRepository.existsByToken(token)) {
-            return new MessageResponse("Token already revoked");
+        if (!revokedTokenRepository.existsByToken(token)) {
+            revokedTokenRepository.save(new RevokedToken(token, LocalDateTime.now()));
         }
 
-        revokedTokenRepository.save(new RevokedToken(token, LocalDateTime.now()));
         return new MessageResponse("User logged out successfully");
     }
 
     @Override
-    public JwtResponse login(LoginRequest request) {
-        User user = userRepository.findUserByEmail(request.email())
+    public JwtResponse refresh(RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new InvalidTokenException("Refresh token is empty");
+        }
+
+        if (revokedTokenRepository.existsByToken(refreshToken)) {
+            throw new InvalidTokenException("Refresh token revoked");
+        }
+
+        String username = jwtService.extractUsername(refreshToken);
+
+        User user = userRepository.findUserByEmail(username)
                 .orElseThrow(UserNotFoundException::new);
 
-        Optional.of(request.password())
-                .filter(p -> passwordEncoder.matches(p, user.getPassword()))
-                .orElseThrow(InvalidPasswordException::new);
+        CustomUserDetails userDetails = new CustomUserDetails(user);
 
-        String token = jwtService.generateToken(new CustomUserDetails(user));
-        UserDto userDto = UserMapper.fromUserToDto(user);
-        return new JwtResponse(token, userDto);
+        String newAccessToken = jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15));
+        String newRefreshToken = jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30));
+
+        return new JwtResponse(
+                newAccessToken,
+                newRefreshToken,
+                UserMapper.fromUserToDto(user)
+        );
     }
 }

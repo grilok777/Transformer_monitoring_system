@@ -29,8 +29,8 @@ public class CreatorServiceImpl implements CreatorService {
 
     @Override
     public List<UserDto> getUsersByRole(Role role) {
-        return userRepository.findAllByRoleNot(role)
-                .stream()
+        return userRepository.findAll().stream()
+                .filter(x -> x.getRole().equals(role))
                 .map(UserMapper::fromUserToDto)
                 .toList();
     }
@@ -45,7 +45,7 @@ public class CreatorServiceImpl implements CreatorService {
     @Override
     public void changeRoleOfUser(Long id, Role role) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + id));
+                .orElseThrow(UserNotFoundException::new);
         user.setRole(role);
         userRepository.save(user);
     }

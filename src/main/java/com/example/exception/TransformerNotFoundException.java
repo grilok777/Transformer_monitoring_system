@@ -1,10 +1,11 @@
 package com.example.exception;
 
-public class TransformerNotFoundException extends RuntimeException{
-    public TransformerNotFoundException(){
+public class TransformerNotFoundException extends RuntimeException {
+    public TransformerNotFoundException() {
         super("Transformer not found");
     }
-    public TransformerNotFoundException(String msg){
+
+    public TransformerNotFoundException(String msg) {
         super(msg);
     }
 }

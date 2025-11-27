@@ -4,22 +4,26 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Component
-@ConfigurationProperties(prefix = "simulation")
 @Data
+@Component
+@ConfigurationProperties(prefix = "simulator")
 public class SimulationProperties {
 
     private double steelLoss;
     private double copperLossNominal;
 
-    private double loadMin;
-    private double loadMax;
+    private Schedule schedule = new Schedule();
+    private LoadFactor loadFactor = new LoadFactor();
 
-    private double ambientMin;
-    private double ambientMax;
+    @Data
+    public static class Schedule {
+        private int delaySeconds;
+        private int intervalSeconds;
+    }
 
-    private double thermalResistance;
-
-    private int initialDelaySec;
-    private int periodSec;
+    @Data
+    public static class LoadFactor {
+        private double min;
+        private double max;
+    }
 }

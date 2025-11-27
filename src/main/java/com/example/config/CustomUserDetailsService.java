@@ -1,10 +1,9 @@
 package com.example.config;
 
-import com.example.entity.postgres.User;
+import com.example.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.example.repository.jpa.UserRepository;
 
@@ -16,9 +15,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new CustomUserDetails(user);
+    public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
+        return new CustomUserDetails(
+                userRepository.findUserByEmail(username)
+                .orElseThrow(UserNotFoundException::new));
     }
 }

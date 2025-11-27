@@ -1,6 +1,5 @@
 package com.example.service.impl;
 
-import com.example.dto.request.TransformerRequest;
 import com.example.entity.mongo.AlertLevel;
 import com.example.entity.mongo.Transformer;
 import com.example.entity.mongo.TransformerStatus;
@@ -39,9 +38,9 @@ public class TransformerServiceImpl implements TransformerService {
     }
 
     @Override
-    public Transformer save(Transformer transformer) {
+    public void save(Transformer transformer) {
         log.info("Saving transformer: {}", transformer.getId());
-        return repository.save(transformer);
+        repository.save(transformer);
     }
 
     @Override
@@ -87,7 +86,6 @@ public class TransformerServiceImpl implements TransformerService {
 
     private void updateStatusInternal(Transformer transformer, Double temp, Double voltage) {
 
-        // Список правил для перевірки температури
         List<StatusRule> tempRules = List.of(
                 new StatusRule(t -> t > TEMP_ERROR, TransformerStatus.ERROR, false,
                         "Критичне перегрівання (>110°C)", AlertLevel.ERROR),
@@ -110,13 +108,12 @@ public class TransformerServiceImpl implements TransformerService {
                     temp, voltage);
             return;
         }
-/*
-        // Якщо нічого не спрацювало — нормальний статус
+
         if (!TransformerStatus.NORMAL.equals(transformer.getStatus())) {
             transformer.setStatus(TransformerStatus.NORMAL);
             transformer.setTransformerCondition(true);
             log.info("Transformer {} status updated to NORMAL", transformer.getId());
-        }*/
+        }
     }
 
     private void applyStatusAndAlert(Transformer transformer, StatusRule rule, Double temp, Double voltage) {
@@ -136,49 +133,5 @@ public class TransformerServiceImpl implements TransformerService {
         boolean matches(Double temp) {
             return condition.test(temp);
         }
-    }
-
-    public Transformer create(TransformerRequest request) {
-        Transformer t = new Transformer();
-        Long newId = getNextId();
-
-        t.setId(newId);
-        t.setManufacturer(request.manufacturer());
-        t.setModelType(request.modelType());
-        t.setRatedPowerKVA(request.ratedPowerKVA());
-        t.setPrimaryVoltageKV(request.primaryVoltageKV());
-        t.setSecondaryVoltageKV(request.secondaryVoltageKV());
-        t.setFrequencyHz(request.frequencyHz());
-        t.setTransformerCondition(request.transformerCondition());
-        t.setRemoteMonitoring(request.remoteMonitoring());
-
-        return repository.save(t);
-    }
-
-    public Transformer update(Long id, TransformerRequest request) {
-        Transformer t = repository.findById(id).orElseThrow();
-
-        if (request.manufacturer() != null) t.setManufacturer(request.manufacturer());
-        if (request.modelType() != null) t.setModelType(request.modelType());
-        if (request.ratedPowerKVA() != null) t.setRatedPowerKVA(request.ratedPowerKVA());
-        if (request.primaryVoltageKV() != null) t.setPrimaryVoltageKV(request.primaryVoltageKV());
-        if (request.secondaryVoltageKV() != null) t.setSecondaryVoltageKV(request.secondaryVoltageKV());
-        if (request.frequencyHz() != null) t.setFrequencyHz(request.frequencyHz());
-        if (request.transformerCondition() != null) t.setTransformerCondition(request.transformerCondition());
-
-        return repository.save(t);
-    }
-
-    public void deactivate(Long id) {
-        Transformer t = repository.findById(id).orElseThrow();
-        t.setTransformerCondition(false);
-        repository.save(t);
-    }
-
-    private Long getNextId() {
-        return repository.findTopByOrderByIdDesc()
-                .map(t -> t.getId())
-                .map(id -> id + 1)                            // +1 коректно
-                .orElse(1L);
     }
 }

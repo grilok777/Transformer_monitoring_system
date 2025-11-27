@@ -57,12 +57,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/creator/**").hasAuthority(
                                 Role.CREATOR.name()
                         )
-                        .requestMatchers("/api/users/**").hasAnyAuthority(
-                                Role.ADMIN.name(),
-                                Role.CREATOR.name()
-                        )
-                        .requestMatchers("/api/home/**").authenticated()
-                        .requestMatchers("/api/profile/**").authenticated()
                         .anyRequest().authenticated()
                 )
 

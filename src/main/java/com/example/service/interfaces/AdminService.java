@@ -5,10 +5,11 @@ import com.example.dto.TransformerDto;
 import com.example.dto.request.TransformerRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AdminService  {
 
-    TransformerDto exportTransformer(Long id);
+    Optional<TransformerDto> exportTransformer(Long id);
 
     List<TransformerDto> exportTransformersRange(Long fromId, Long toId);
 
@@ -20,9 +21,7 @@ public interface AdminService  {
 
     List<String> exportTransformerLogs(Long id);
 
-    TransformerDto createTransformer(TransformerRequest request);
-
-    TransformerDto updateTransformer(Long id, TransformerRequest request);
+    void updateTransformer(Long id, TransformerRequest request);
 
     void deactivateTransformer(Long id);
 }

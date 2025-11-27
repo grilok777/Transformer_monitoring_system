@@ -13,7 +13,7 @@ public interface TransformerService {
 
     List<Transformer> getAll();
 
-    Transformer save(Transformer transformer);
+    void save(Transformer transformer);
 
     TransformerStatus checkStatus(Long transformerId);
 

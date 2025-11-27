@@ -30,10 +30,11 @@ public class HomeController {
 
         return ResponseEntity.ok(new MessageResponse(
                 switch (role) {
-                    case ADMIN -> "ADMIN_HOME";
-                    case CREATOR -> "CREATOR_HOME";
-                    case DATA_ANALYST -> "ANALYST_HOME";
-                    default -> "USER_HOME";
+                    case ADMIN -> "ADMIN";
+                    case CREATOR -> "CREATOR";
+                    case DATA_ANALYST -> "ANALYST";
+                    case OPERATOR -> "OPERATOR";
+                    default -> "UNDEFINED";
                 }));
     }
 }

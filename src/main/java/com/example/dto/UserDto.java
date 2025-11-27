@@ -9,7 +9,6 @@ public record UserDto(Long id,
                       ) {
     @Override
     public String toString(){
-        return "{id}=" + id + " {nameUKR}=" + nameUKR + " {email}=" + email + " {role}" + role.name()
-                ;
+        return "{id}=" + id + " {nameUKR}=" + nameUKR + " {email}=" + email + " {role}" + role.name();
     }
 }

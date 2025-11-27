@@ -16,31 +16,16 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class AlertServiceImpl implements AlertService {
-    private final AlertRepository repository;
+    private final AlertRepository alertRepository;
 
 
     private Long getNextId() {
-        return repository.findTopByOrderByIdDesc()
+        return alertRepository.findTopByOrderByIdDesc()
                 .map(Alert::getId)
                 .map(id -> id + 1)
                 .orElse(1L);
     }
-/*
-    @Override
-    public void createAndSaveAlert(Long transformerId, String message, AlertLevel level, Double temp, Double volt) {
-        repository.save(
-                new Alert(
-                getNextId(),
-                transformerId,
-                message,
-                level,
-                temp,
-                volt,
-                LocalDateTime.now().toString(),
-                (level == AlertLevel.ERROR || level == AlertLevel.CRITICAL ? 0 : 1)
-        ));
-    }
-**/
+
     public void createAndSaveAlert(Long transformerId, String message, AlertLevel level, Double temp, Double volt) {
         create(new AlertRequest(transformerId, message, level, temp, volt));
     }
@@ -58,12 +43,12 @@ public class AlertServiceImpl implements AlertService {
                 (request.level() == AlertLevel.ERROR || request.level() == AlertLevel.CRITICAL ? 0 : 1)
         );
 
-        return repository.save(alert);
+        return alertRepository.save(alert);
     }
 
     @Override
     public List<AlertDto> getActiveAlerts() {
-        return repository.findAll()
+        return alertRepository.findAll()
                 .stream()
                 .filter(a -> a.getProblemResolved() == 0)
                 .map(AlertMapper::toDto)
@@ -73,20 +58,19 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public void createOperatorNote(Long id) {
-        Alert alert = repository.findById(id)
+        Alert alert = alertRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Alert not found: " + id));
 
         alert.setProblemResolved(1);
-        repository.save(alert);
+        alertRepository.save(alert);
     }
     @Override
     public List<Alert> findAll() {
-        return repository.findAll(); // ← Реалізація
+        return alertRepository.findAll();
     }
 
     @Override
-    public List<Alert> getAlertsByTransformerId(Long transformerId) {//Long
-        return repository.findByTransformerId(transformerId);
+    public List<Alert> getAlertsByTransformerId(Long transformerId) {
+        return alertRepository.findByTransformerId(transformerId);
     }
-
 }

@@ -21,7 +21,7 @@ public class CustomUserDetails implements UserDetails {
         return List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
-    public Long getId(){
+    public Long getId() {
         return user.getId();
     }
 

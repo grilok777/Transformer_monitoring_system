@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Document(collection = "Transformers")
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transformer {

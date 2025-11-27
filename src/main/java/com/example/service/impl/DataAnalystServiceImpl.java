@@ -2,10 +2,14 @@ package com.example.service.impl;
 
 import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
+import com.example.exception.TransformerNotFoundException;
 import com.example.mapper.AlertMapper;
 import com.example.mapper.TransformerMapper;
 import com.example.entity.mongo.AlertLevel;
+import com.example.service.interfaces.AlertService;
 import com.example.service.interfaces.DataAnalystService;
+import com.example.service.interfaces.OperatorService;
+import com.example.service.interfaces.TransformerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +19,14 @@ import java.util.List;
 @AllArgsConstructor
 public class DataAnalystServiceImpl implements DataAnalystService {
 
-    private final OperatorServiceImpl operatorService;
-    private final TransformerServiceImpl transformerService;
-    private final AlertServiceImpl alertService;
-
-
+    private final OperatorService operatorService;
+    private final TransformerService transformerService;
+    private final AlertService alertService;
 
     @Override
     public TransformerDto exportTransformer(Long id) {
-        return operatorService.getTransformerStatus(id);
+        return operatorService.getTransformer(id)
+                .orElseThrow(TransformerNotFoundException::new);
     }
 
     @Override
@@ -37,7 +40,9 @@ public class DataAnalystServiceImpl implements DataAnalystService {
 
     @Override
     public List<TransformerDto> exportAllTransformers() {
-        return operatorService.getAllTransformersStatus().stream()
+        return transformerService.getAll()
+                .stream()
+                .map(TransformerMapper::toDto)
                 .toList();
     }
 
@@ -60,11 +65,10 @@ public class DataAnalystServiceImpl implements DataAnalystService {
     public List<String> exportTransformerLogs(Long id) {
 
         return transformerService.getById(id)
-                .orElseThrow(() -> new RuntimeException("Трансформатор не знайдено"))
+                .orElseThrow(TransformerNotFoundException::new)
                 .getDataLogs()
                 .stream()
                 .map(Object::toString)
                 .toList();
     }
 }
-

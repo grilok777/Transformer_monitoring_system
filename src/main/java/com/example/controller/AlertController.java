@@ -16,10 +16,6 @@ public class AlertController {
 
     private final AlertService alertService;
 
-    // треба бути створити
-    // CreateAlertRequest (DTO)
-    // по аналогії з RegisterRequest
-
     @PostMapping("/create")
     public Alert create(@RequestBody AlertRequest request ) {
         return alertService.create(request);
