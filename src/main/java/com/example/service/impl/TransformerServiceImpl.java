@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.example.dto.request.TransformerRequest;
 import com.example.entity.mongo.AlertLevel;
 import com.example.entity.mongo.Transformer;
 import com.example.entity.mongo.TransformerStatus;
@@ -59,6 +60,8 @@ public class TransformerServiceImpl implements TransformerService {
         transformer.setCurrentTemperature(temp);
         transformer.setCurrentVoltage(voltage);
 
+        updateStatusInternal(transformer, temp, voltage);
+
         Map<String, Object> logEntry = new HashMap<>();
         logEntry.put("timestamp", LocalDateTime.now());
         logEntry.put("power", power);
@@ -68,7 +71,7 @@ public class TransformerServiceImpl implements TransformerService {
 
         transformer.getDataLogs().add(logEntry);
 
-        updateStatusInternal(transformer, temp, voltage);
+        //updateStatusInternal(transformer, temp, voltage);
 
         repository.save(transformer);
         log.debug("Updated transformer data: {}", transformer.getId());
@@ -84,31 +87,52 @@ public class TransformerServiceImpl implements TransformerService {
         log.debug("Updated transformer status: {}", transformer.getId());
     }
 
+    // 1. Виносимо правила в статичну константу (щоб не створювати об'єкт List при кожному виклику методу)
+    private static final List<StatusRule> TEMP_RULES = List.of(
+            new StatusRule(t -> t > TEMP_ERROR, TransformerStatus.ERROR, false,
+                    String.format("Критичне перегрівання (>%.0f°C)", TEMP_ERROR), AlertLevel.ERROR),
+            new StatusRule(t -> t > TEMP_CRITICAL, TransformerStatus.CRITICAL, false,
+                    String.format("Висока температура (>%.0f°C)", TEMP_CRITICAL), AlertLevel.CRITICAL)
+    );
+
     private void updateStatusInternal(Transformer transformer, Double temp, Double voltage) {
-
-        List<StatusRule> tempRules = List.of(
-                new StatusRule(t -> t > TEMP_ERROR, TransformerStatus.ERROR, false,
-                        "Критичне перегрівання (>110°C)", AlertLevel.ERROR),
-                new StatusRule(t -> t > TEMP_CRITICAL, TransformerStatus.CRITICAL, false,
-                        "Висока температура (>100°C)", AlertLevel.CRITICAL)
-        );
-
-        tempRules.stream()
+        // 2. Перевірка температури (пріоритетна)
+        // Використовуємо findFirst і повертаємо результат, щоб зупинити метод
+        Optional<StatusRule> matchedTempRule = TEMP_RULES.stream()
                 .filter(rule -> rule.matches(temp))
-                .findFirst()
-                .ifPresent(rule -> applyStatusAndAlert(transformer, rule, temp, voltage));
+                .findFirst();
 
+        if (matchedTempRule.isPresent()) {
+            applyStatusAndAlert(transformer, matchedTempRule.get(), temp, voltage);
+            return; // ВАЖЛИВО: Виходимо, щоб не перезаписати статус
+        }
 
-        Double secondaryKV = Double.valueOf(transformer.getSecondaryVoltageKV());
-
-        if (voltage < secondaryKV * (1 - VOLTAGE_DEVIATION) || voltage > secondaryKV * (1 + VOLTAGE_DEVIATION)) {
+        // 3. Перевірка напруги
+        if (isVoltageAbnormal(transformer, voltage)) {
             applyStatusAndAlert(transformer,
                     new StatusRule(t -> true, TransformerStatus.ERROR, false,
                             "Відхилення напруги ±10%", AlertLevel.ERROR),
                     temp, voltage);
-            return;
+            return; // ВАЖЛИВО: Виходимо
         }
 
+        // 4. Якщо жодна проблема не знайдена — статус NORMAL
+        setNormalStatusIfNeeded(transformer);
+    }
+
+    // Допоміжний метод для перевірки напруги (виносить логіку if)
+    private boolean isVoltageAbnormal(Transformer transformer, Double voltage) {
+        if (transformer.getSecondaryVoltageKV() == null) return false; // Захист від NPE
+
+        double secondaryKV = Double.valueOf(transformer.getSecondaryVoltageKV());
+        double minVoltage = secondaryKV * (1 - VOLTAGE_DEVIATION);
+        double maxVoltage = secondaryKV * (1 + VOLTAGE_DEVIATION);
+
+        return voltage < minVoltage || voltage > maxVoltage;
+    }
+
+    // Допоміжний метод для встановлення норми
+    private void setNormalStatusIfNeeded(Transformer transformer) {
         if (!TransformerStatus.NORMAL.equals(transformer.getStatus())) {
             transformer.setStatus(TransformerStatus.NORMAL);
             transformer.setTransformerCondition(true);
@@ -133,5 +157,49 @@ public class TransformerServiceImpl implements TransformerService {
         boolean matches(Double temp) {
             return condition.test(temp);
         }
+    }
+
+    public Transformer create(TransformerRequest request) {
+        Transformer t = new Transformer();
+        Long newId = getNextId();
+
+        t.setId(newId);
+        t.setManufacturer(request.manufacturer());
+        t.setModelType(request.modelType());
+        t.setRatedPowerKVA(request.ratedPowerKVA());
+        t.setPrimaryVoltageKV(request.primaryVoltageKV());
+        t.setSecondaryVoltageKV(request.secondaryVoltageKV());
+        t.setFrequencyHz(request.frequencyHz());
+        t.setTransformerCondition(request.transformerCondition());
+        t.setRemoteMonitoring(request.remoteMonitoring());
+
+        return repository.save(t);
+    }
+
+    public Transformer update(Long id, TransformerRequest request) {
+        Transformer t = repository.findById(id).orElseThrow();
+
+        if (request.manufacturer() != null) t.setManufacturer(request.manufacturer());
+        if (request.modelType() != null) t.setModelType(request.modelType());
+        if (request.ratedPowerKVA() != null) t.setRatedPowerKVA(request.ratedPowerKVA());
+        if (request.primaryVoltageKV() != null) t.setPrimaryVoltageKV(request.primaryVoltageKV());
+        if (request.secondaryVoltageKV() != null) t.setSecondaryVoltageKV(request.secondaryVoltageKV());
+        if (request.frequencyHz() != null) t.setFrequencyHz(request.frequencyHz());
+        if (request.transformerCondition() != null) t.setTransformerCondition(request.transformerCondition());
+
+        return repository.save(t);
+    }
+
+    public void deactivate(Long id) {
+        Transformer t = repository.findById(id).orElseThrow();
+        t.setTransformerCondition(false);
+        repository.save(t);
+    }
+
+    private Long getNextId() {
+        return repository.findTopByOrderByIdDesc()
+                .map(t -> t.getId())
+                .map(id -> id + 1)                            // +1 коректно
+                .orElse(1L);
     }
 }

@@ -3,7 +3,7 @@ simulator:
   copper-loss-nominal: 10.5
   schedule:
     delay-seconds: 5
-    interval-seconds: 20
+    interval-seconds: 80
   load-factor:
     min: 0.788
     max: 0.876

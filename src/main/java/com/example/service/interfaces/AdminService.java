@@ -21,6 +21,8 @@ public interface AdminService  {
 
     List<String> exportTransformerLogs(Long id);
 
+    void createTransformer(TransformerRequest request);
+
     void updateTransformer(Long id, TransformerRequest request);
 
     void deactivateTransformer(Long id);
