@@ -1,12 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvUsers"
+    <LinearLayout
+        android:id="@+id/operatorRoot"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ===== SECTION HEADER ===== -->
+        <TextView
+            android:id="@+id/tvOperatorTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Operator Tools"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="12dp" />
+
+        <!-- ===== INPUT FIELD ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transformer ID:"
+            android:textSize="14sp"
+            android:paddingBottom="4dp" />
+
+        <EditText
+            android:id="@+id/inputTransformerId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter transformer ID"
+            android:inputType="number"
+            android:background="@android:drawable/editbox_background_normal"
+            android:padding="10dp" />
+
+        <!-- ===== BUTTONS BLOCK ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnGetAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show All Transformers" />
+
+            <Button
+                android:id="@+id/btnGetById"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Transformer by ID"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btnGetAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Transformer Alerts"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btnProcessError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Process Error"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- ===== OUTPUT BLOCK ===== -->
+        <TextView
+            android:id="@+id/tvOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textSize="16sp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:background="#EEEEEE"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

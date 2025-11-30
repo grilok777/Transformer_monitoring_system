@@ -1,9 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/adminRoot"
     android:orientation="vertical"
+    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/layout_base_role"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnCreate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Створити трансформатор" />
+
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Редагувати трансформатор" />
+
+            <Button
+                android:id="@+id/btnDeactivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Деактивувати трансформатор" />
+
+            <View android:layout_height="8dp" android:layout_width="match_parent"/>
+
+            <Button
+                android:id="@+id/btnExportOne"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Експорт одного" />
+
+            <Button
+                android:id="@+id/btnExportRange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Експорт діапазону" />
+
+            <Button
+                android:id="@+id/btnExportAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Експорт всіх" />
+
+            <View android:layout_height="8dp" android:layout_width="match_parent"/>
+
+            <Button
+                android:id="@+id/btnAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Усі помилки" />
+
+            <Button
+                android:id="@+id/btnCriticalAlerts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Критичні помилки" />
+
+            <Button
+                android:id="@+id/btnLogs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Експорт логів" />
+
+            <View android:layout_height="12dp" android:layout_width="match_parent"/>
+
+            <TextView
+                android:id="@+id/tvAdminOutput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Вихідні дані з'являться тут"
+                android:padding="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

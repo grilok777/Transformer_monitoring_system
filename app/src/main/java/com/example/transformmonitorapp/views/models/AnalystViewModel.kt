@@ -2,16 +2,18 @@ package com.example.transformmonitorapp.views.models
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.transformmonitorapp.data.repository.interfaces.AdminRepository
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.transformmonitorapp.data.repository.interfaces.AnalyticRepository
 import com.example.transformmonitorapp.domain.dto.TransformerDto
-import com.example.transformmonitorapp.domain.dto.request.TransformerRequest
 import kotlinx.coroutines.launch
 
-class AdminViewModel(
+class AnalystViewModel(
     application: Application,
-    private val adminRepository: AdminRepository
+    private val analyticRepository: AnalyticRepository
 ) : AndroidViewModel(application) {
+
     private val _status = MutableLiveData<String>()
     val status: LiveData<String> = _status
 
@@ -24,57 +26,11 @@ class AdminViewModel(
     private val _textResult = MutableLiveData<String>()
     val textResult: LiveData<String> = _textResult
 
-    fun createTransformer(request: TransformerRequest) {
-        viewModelScope.launch {
-            try {
-                val resp = adminRepository.createTransformer(request)
-                if (resp.isSuccessful) {
-                    _transformerResult.postValue(resp.body())
-                    _status.postValue("Створено успішно")
-                } else {
-                    _status.postValue("Помилка створення: ${resp.code()}")
-                }
-            } catch (e: Exception) {
-                _status.postValue("Exception: ${e.message}")
-            }
-        }
-    }
-
-    fun updateTransformer(id: Long, request: TransformerRequest) {
-        viewModelScope.launch {
-            try {
-                val resp = adminRepository.updateTransformer(id, request)
-                if (resp.isSuccessful) {
-                    _transformerResult.postValue(resp.body())
-                    _status.postValue("Оновлено успішно")
-                } else {
-                    _status.postValue("Помилка оновлення: ${resp.code()}")
-                }
-            } catch (e: Exception) {
-                _status.postValue("Exception: ${e.message}")
-            }
-        }
-    }
-
-    fun deactivateTransformer(id: Long) {
-        viewModelScope.launch {
-            try {
-                val resp = adminRepository.deactivateTransformer(id)
-                if (resp.isSuccessful) {
-                    _status.postValue("Деактивовано (id=$id)")
-                } else {
-                    _status.postValue("Помилка деактивації: ${resp.code()}")
-                }
-            } catch (e: Exception) {
-                _status.postValue("Exception: ${e.message}")
-            }
-        }
-    }
 
     fun exportTransformer(id: Long) {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.exportTransformer(id)
+                val resp = analyticRepository.exportTransformer(id)
                 if (resp.isSuccessful) {
                     _transformerResult.postValue(resp.body())
                     _status.postValue("Експорт успішний")
@@ -90,7 +46,7 @@ class AdminViewModel(
     fun exportTransformersRange(from: Long, to: Long) {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.exportTransformerRange(from, to)
+                val resp = analyticRepository.exportTransformerRange(from, to)
                 if (resp.isSuccessful) {
                     _transformerList.postValue(resp.body() ?: emptyList())
                     _status.postValue("Експорт діапазону успішний")
@@ -106,7 +62,7 @@ class AdminViewModel(
     fun exportAllTransformers() {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.exportAllTransformers()
+                val resp = analyticRepository.exportAllTransformers()
                 if (resp.isSuccessful) {
                     _transformerList.postValue(resp.body() ?: emptyList())
                     _status.postValue("Експорт всіх успішний")
@@ -122,7 +78,7 @@ class AdminViewModel(
     fun getAllAlerts() {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.getAllAlerts()
+                val resp = analyticRepository.getAllAlerts()
                 if (resp.isSuccessful) {
                     _textResult.postValue(resp.body()?.joinToString("\n") ?: "Немає")
                     _status.postValue("Отримано помилки")
@@ -138,7 +94,7 @@ class AdminViewModel(
     fun getCriticalAlerts() {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.getCriticalAlerts()
+                val resp = analyticRepository.getCriticalAlerts()
                 if (resp.isSuccessful) {
                     _textResult.postValue(resp.body()?.joinToString("\n") ?: "Немає критичних")
                     _status.postValue("Отримано критичні")
@@ -154,7 +110,7 @@ class AdminViewModel(
     fun exportLogs(id: Long) {
         viewModelScope.launch {
             try {
-                val resp = adminRepository.exportLogs(id)
+                val resp = analyticRepository.exportLogs(id)
                 if (resp.isSuccessful) {
                     _textResult.postValue(resp.body()?.joinToString("\n") ?: "Немає логів")
                     _status.postValue("Експорт логів успішний")
