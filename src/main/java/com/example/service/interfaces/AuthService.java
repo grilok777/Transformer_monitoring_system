@@ -8,6 +8,7 @@ import com.example.dto.request.RegisterRequest;
 import com.example.dto.response.MessageResponse;
 
 public interface AuthService {
+
     JwtResponse login(LoginRequest request);
 
     JwtResponse refresh(RefreshTokenRequest request);

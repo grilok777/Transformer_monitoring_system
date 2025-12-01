@@ -3,7 +3,6 @@ package com.example.service.impl;
 import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import com.example.dto.request.TransformerRequest;
-import com.example.entity.mongo.Transformer;
 import com.example.exception.TransformerNotFoundException;
 import com.example.mapper.AlertMapper;
 import com.example.mapper.TransformerMapper;
@@ -27,36 +26,18 @@ public class AdminServiceImpl implements AdminService {
     private final OperatorService operatorService;
 
 
+    public void createTransformer(TransformerRequest request) {
+        TransformerMapper.toDto(transformerService.create(request));
+    }
+
     @Override
     public void updateTransformer(Long id, TransformerRequest request) {
-
-        Transformer existing = transformerService.getById(id)
-                .orElseThrow(TransformerNotFoundException::new);
-
-        Transformer updated = existing.toBuilder()
-                .manufacturer(request.manufacturer())
-                .modelType(request.modelType())
-                .ratedPowerKVA(request.ratedPowerKVA())
-                .primaryVoltageKV(request.primaryVoltageKV())
-                .secondaryVoltageKV(request.secondaryVoltageKV())
-                .frequencyHz(request.frequencyHz())
-                .transformerCondition(request.transformerCondition())
-                .remoteMonitoring(request.remoteMonitoring())
-                .build();
-
-        transformerService.save(updated);
+        TransformerMapper.toDto(transformerService.update(id, request));
     }
 
     @Override
     public void deactivateTransformer(Long id) {
-        Transformer t = transformerService.getById(id)
-                .orElseThrow(TransformerNotFoundException::new);
-
-        Transformer updated = t.toBuilder()
-                .transformerCondition(false)  // деактивація = вимкнений
-                .build();
-
-        transformerService.save(updated);
+        transformerService.deactivate(id);
     }
 
     @Override
@@ -74,7 +55,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<TransformerDto> exportAllTransformers() {
-        return operatorService.getAllTransformers().stream().toList();
+        return operatorService.getAllTransformers().stream().toList();////;
     }
 
     @Override

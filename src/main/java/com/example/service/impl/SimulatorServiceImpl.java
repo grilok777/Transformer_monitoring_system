@@ -53,16 +53,16 @@ public class SimulatorServiceImpl implements SimulatorService {
 
     private void simulateStep(Long transformerId) {
         try {
-            Transformer t = transformerService.getById(transformerId).orElseThrow();
+            Transformer transformer = transformerService.getById(transformerId).orElseThrow();
 
             double loadFactor = 0.788 + random.nextDouble() * 0.088;
-            double efficiency = calculateEfficiency(t.getRatedPowerKVA(), loadFactor);
-            double power = t.getRatedPowerKVA() * efficiency;
+            double efficiency = calculateEfficiency(transformer.getRatedPowerKVA(), loadFactor);
+            double power = transformer.getRatedPowerKVA() * efficiency;
             double temperature = calculateTemperature(loadFactor);
 
             double num = 3.0;
             double currentAmpere = power / (Math.pow(num, 1.0 / 3.0)
-                    * t.getSecondaryVoltageKV() * loadFactor);
+                    * transformer.getSecondaryVoltageKV() * loadFactor);
 
             double voltage = (power / currentAmpere) * loadFactor;
 
@@ -76,7 +76,7 @@ public class SimulatorServiceImpl implements SimulatorService {
                     String.format("%.2f", temperature),
                     String.format("%.2f", voltage),
                     String.format("%.2f", efficiency * 100),
-                    t.getStatus().name()
+                    transformer.getStatus().name()
             );
 
         } catch (Exception e) {

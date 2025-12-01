@@ -5,6 +5,7 @@ import com.example.service.interfaces.DataAnalystService;
 import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,34 +25,38 @@ public class DataAnalystController {
         return new MessageResponse("");
     }
 
-    @GetMapping("/transformer/{id}")
-    public TransformerDto getTransformer(@PathVariable Long id) {
-        return analystService.exportTransformer(id);
+    @GetMapping("/transformer/export/{id}")
+    public ResponseEntity<TransformerDto> getTransformer(@PathVariable("id") Long id) {
+
+        return ResponseEntity.ok(analystService.exportTransformer(id));
     }
 
-    @GetMapping("/transformers/{from}/{to}")
-    public List<TransformerDto> getTransformersRange(@PathVariable Long from,
-                                                     @PathVariable Long to) {
-        return analystService.exportTransformersRange(from, to);
+    @GetMapping("/transformers/export/{from}/{to}")
+    public ResponseEntity<List<TransformerDto>> getTransformersRange(@PathVariable("from") Long from,
+                                                                     @PathVariable("to") Long to) {
+        return ResponseEntity.ok(analystService.exportTransformersRange(from, to));
     }
 
-    @GetMapping("/transformers")
-    public List<TransformerDto> getAll() {
-        return analystService.exportAllTransformers();
+    @GetMapping("/transformers/export/all")
+    public ResponseEntity<List<TransformerDto>> getAll() {
+
+        return ResponseEntity.ok(analystService.exportAllTransformers());
     }
 
     @GetMapping("/alerts")
-    public List<AlertDto> getAllAlerts() {
-        return analystService.getAllErrors();
+    public ResponseEntity<List<AlertDto>> getAllAlerts() {
+
+        return ResponseEntity.ok(analystService.getAllErrors());
     }
 
     @GetMapping("/alerts/critical")
-    public List<AlertDto> getCriticalAlerts() {
-        return analystService.getCriticalAlerts();
+    public ResponseEntity<List<AlertDto>> getCriticalAlerts() {
+
+        return ResponseEntity.ok(analystService.getCriticalAlerts());
     }
 
-    @GetMapping("/logs/{id}")
-    public List<String> getLogs(@PathVariable Long id) {
-        return analystService.exportTransformerLogs(id);
+    @GetMapping("/logs/export/{id}")
+    public ResponseEntity<List<String>> getLogs(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(analystService.exportTransformerLogs(id));
     }
 }

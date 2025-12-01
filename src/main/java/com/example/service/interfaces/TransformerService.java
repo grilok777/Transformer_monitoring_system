@@ -1,6 +1,7 @@
 package com.example.service.interfaces;
 
 
+import com.example.dto.request.TransformerRequest;
 import com.example.entity.mongo.Transformer;
 import com.example.entity.mongo.TransformerStatus;
 
@@ -20,4 +21,10 @@ public interface TransformerService {
     void updateData(Long id, Double power, Double temperature, Double voltage);
 
     void updateStatus(Long transformerId, Double temperature, Double voltage);
+
+    Transformer create(TransformerRequest request);
+
+    void deactivate(Long id);
+
+    Transformer update(Long id, TransformerRequest request);
 }

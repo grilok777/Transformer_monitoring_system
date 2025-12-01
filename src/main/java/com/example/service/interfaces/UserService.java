@@ -1,6 +1,7 @@
 package com.example.service.interfaces;
 
 import com.example.dto.UserDto;
+import com.example.dto.request.ChangeEmailRequest;
 import com.example.dto.request.ChangeNameRequest;
 import com.example.dto.request.ChangePasswordRequest;
 import com.example.dto.request.RegisterRequest;
@@ -10,11 +11,14 @@ import java.util.Optional;
 
 
 public interface UserService {
+
     void createUser(RegisterRequest request, Role role);
 
     void changePassword(ChangePasswordRequest request);
 
     void changeName(ChangeNameRequest request);
+
+    void changeEmail(ChangeEmailRequest request);
 
     Optional<UserDto> getUserByEmail(String email);
 }

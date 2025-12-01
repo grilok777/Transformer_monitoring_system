@@ -14,15 +14,11 @@ public class UserFactory {
     private final PasswordEncoder passwordEncoder;
 
     public User createUser(Role role, RegisterRequest request) {
-        if (role == null) {
-            role = Role.UNDEFINED;
-        }
-
-        User user = new User();
-        user.setEmail(request.email());
-        user.setNameUKR(request.nameUKR());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole(role);
-        return user;
+        return User.builder()
+                .email(request.email())
+                .nameUKR(request.nameUKR())
+                .password(passwordEncoder.encode(request.password()))
+                .role(role != null ? role : Role.UNDEFINED)
+                .build();
     }
 }

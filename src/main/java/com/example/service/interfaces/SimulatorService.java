@@ -9,4 +9,3 @@ public interface SimulatorService {
      */
     void startSimulation(Long transformerId);
 }
-

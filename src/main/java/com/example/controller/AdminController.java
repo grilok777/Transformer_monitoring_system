@@ -2,7 +2,9 @@ package com.example.controller;
 
 import com.example.exception.TransformerNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.AlertDto;
@@ -20,46 +22,57 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
 
-    @PutMapping("/transformer/{id}")
-    public void update(@PathVariable Long id,
-                                 @RequestBody TransformerRequest request) {
+    @PostMapping("/transformer/create")
+    public void create(@RequestBody TransformerRequest request) {
+        adminService.createTransformer(request);
+    }
+
+    @PutMapping("/transformer/update/{id}")
+    public void update(@PathVariable("id") Long id,
+                       @RequestBody TransformerRequest request) {
         adminService.updateTransformer(id, request);
     }
 
-    @DeleteMapping("/transformer/{id}")
-    public void deactivateTransformer(@PathVariable Long id) {
+    @DeleteMapping("/transformer/deactivate/{id}")
+    public void deactivateTransformer(@PathVariable("id") Long id) {
         adminService.deactivateTransformer(id);
     }
 
-    @GetMapping("/transformer/{id}")
-    public TransformerDto exportOne(@PathVariable Long id) {
-        return adminService.exportTransformer(id)
-                .orElseThrow(TransformerNotFoundException::new);
+    @GetMapping("/transformer/export/{id}")
+    public ResponseEntity<TransformerDto> exportOne(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(adminService.exportTransformer(id)
+                .orElseThrow(TransformerNotFoundException::new));
     }
 
-    @GetMapping("/transformers/{from}/{to}")
-    public List<TransformerDto> exportRange(@PathVariable Long from,
-                                            @PathVariable Long to) {
-        return adminService.exportTransformersRange(from, to);
+    @GetMapping("/transformers/export/{from}/{to}")
+    public ResponseEntity<List<TransformerDto>> exportRange(@PathVariable("from") Long from,
+                                                            @PathVariable("to") Long to) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Logged in user: " + auth.getName());
+        System.out.println("Authorities: " + auth.getAuthorities());
+        return ResponseEntity.ok(adminService.exportTransformersRange(from, to));
     }
 
-    @GetMapping("/transformers")
-    public List<TransformerDto> exportAll() {
-        return adminService.exportAllTransformers();
+    @GetMapping("/transformers/export/all")
+    public ResponseEntity<List<TransformerDto>> exportAll() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Logged in user: " + auth.getName());
+        System.out.println("Authorities: " + auth.getAuthorities());
+        return ResponseEntity.ok(adminService.exportAllTransformers());
     }
 
     @GetMapping("/alerts")
-    public List<AlertDto> getAllErrors() {
-        return adminService.getAllErrors();
+    public ResponseEntity<List<AlertDto>> getAllErrors() {
+        return ResponseEntity.ok(adminService.getAllErrors());
     }
 
     @GetMapping("/alerts/critical")
-    public List<AlertDto> getCriticalAlerts() {
-        return adminService.getCriticalAlerts();
+    public ResponseEntity<List<AlertDto>> getCriticalAlerts() {
+        return ResponseEntity.ok(adminService.getCriticalAlerts());
     }
 
-    @GetMapping("/logs/{id}")
-    public List<String> exportLogs(@PathVariable Long id) {
-        return adminService.exportTransformerLogs(id);
+    @GetMapping("/logs/export/{id}")
+    public ResponseEntity<List<String>> exportLogs(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(adminService.exportTransformerLogs(id));
     }
 }

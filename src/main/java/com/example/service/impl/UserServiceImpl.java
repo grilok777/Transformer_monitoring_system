@@ -1,6 +1,7 @@
 package com.example.service.impl;
 
 import com.example.dto.UserDto;
+import com.example.dto.request.ChangeEmailRequest;
 import com.example.dto.request.ChangeNameRequest;
 import com.example.dto.request.ChangePasswordRequest;
 import com.example.dto.request.RegisterRequest;
@@ -51,7 +52,22 @@ public class UserServiceImpl implements UserService {
     public void changeName(ChangeNameRequest request) {
         User user = userRepository.findById(request.id())
                 .orElseThrow(UserNotFoundException::new);
+        if (request.name() == null || request.name().isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or empty");
+        }
         user.setNameUKR(request.name());
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void changeEmail(ChangeEmailRequest request) {
+        User user = userRepository.findById(request.id())
+                .orElseThrow(UserNotFoundException::new);
+        if (request.newEmail() == null || request.newEmail().isBlank()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
+        user.setEmail(request.newEmail());
         userRepository.save(user);
     }
 
