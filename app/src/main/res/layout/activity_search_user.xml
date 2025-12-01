@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
@@ -7,15 +8,20 @@
 
     <EditText
         android:id="@+id/etSearchEmail"
+        style="@style/BaseEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Введіть email користувача" />
+        android:autofillHints=""
+        android:hint="@string/email"
+        tools:ignore="TextFields" />
 
     <Button
         android:id="@+id/btnSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Пошук" />
+        style="@style/BaseButton"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/search" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsers"

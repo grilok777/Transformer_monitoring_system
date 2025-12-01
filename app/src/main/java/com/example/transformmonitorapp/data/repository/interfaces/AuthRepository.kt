@@ -8,6 +8,7 @@ import com.example.transformmonitorapp.domain.dto.response.MessageResponse
 import retrofit2.Response
 
 interface AuthRepository {
+
     suspend fun registerUser(request: RegisterRequest): Response<MessageResponse>
 
     suspend fun loginUser(request: LoginRequest): Response<JwtResponse>
@@ -15,4 +16,5 @@ interface AuthRepository {
     suspend fun logout(token: LogoutRequest): Response<MessageResponse>
 
     suspend fun pingUser(): Response<Unit>
+    suspend fun updateUser(id : Long, newName : String, newEmail : String, newPassword : String)
 }

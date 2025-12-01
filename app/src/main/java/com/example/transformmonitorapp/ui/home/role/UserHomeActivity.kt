@@ -35,7 +35,4 @@ class UserHomeActivity : RoleActivity() {
 
     override fun customizeAsideMenu() {
     }
-
-    override fun navigateToProfile() {
-    }
 }

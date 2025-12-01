@@ -7,13 +7,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.transformmonitorapp.R
-import com.example.transformmonitorapp.data.network.ApiServiceProvider
 import com.example.transformmonitorapp.data.repository.impl.AuthRepositoryImpl
 import com.example.transformmonitorapp.data.repository.interfaces.AuthRepository
 import com.example.transformmonitorapp.ui.register.RegisterActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -23,16 +24,15 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         lifecycleScope.launch {
-            val authRepository = AuthRepositoryImpl(applicationContext)
-            val serverAvailable = checkServerConnection(authRepository)
+            val available = waitUntilServerOnline(AuthRepositoryImpl(applicationContext))
 
-            if (serverAvailable) {
+            if (available) {
                 startActivity(Intent(this@SplashActivity, RegisterActivity::class.java))
                 finish()
             } else {
                 Toast.makeText(
                     this@SplashActivity,
-                    "Сервер недоступний. Спробуйте пізніше.",
+                    R.string.serverNotAvailable,
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -49,5 +49,20 @@ class SplashActivity : AppCompatActivity() {
                 false
             }
         }
+    }
+    private suspend fun waitUntilServerOnline(
+        authRepository: AuthRepository,
+        maxAttempts: Int = 5
+    ): Boolean {
+
+        repeat(maxAttempts) { attempt ->
+            val success = checkServerConnection(authRepository)
+
+            if (success) return true
+
+            delay(TimeUnit.SECONDS.toMillis(3))
+        }
+
+        return false
     }
 }

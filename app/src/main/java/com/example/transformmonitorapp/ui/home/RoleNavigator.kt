@@ -15,7 +15,7 @@ class RoleNavigator(private val context: Context) {
         val intent = when (role.uppercase()) {
             "CREATOR" -> Intent(context, CreatorActivity::class.java)
             "OPERATOR" -> Intent(context, OperatorActivity::class.java)
-            "ANALYST" -> Intent(context, AnalystActivity::class.java)
+            "DATA_ANALYST" -> Intent(context, AnalystActivity::class.java)
             "ADMIN" -> Intent(context, AdminActivity::class.java)
             else -> Intent(context, UserHomeActivity::class.java)
         }

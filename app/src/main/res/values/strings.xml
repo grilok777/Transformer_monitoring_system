@@ -19,4 +19,11 @@
     <string name="admins">Адміністратори</string>
     <string name="search">Пошук користувачів</string>
     <string name="profile">Профіль</string>
+    <string name="serverNotAvailable">Сервер недоступний. Спробуйте пізніше\n</string>
+    <string name="edit">Редагувати</string>
+    <string name="save">Зберегти</string>
+    <string name="editProfile">Редагувати профіль</string>
+    <string name="profile_with_username">Вітаємо, %1$s</string>
+    <string name="name">Ім\'я</string>
+
 </resources>
