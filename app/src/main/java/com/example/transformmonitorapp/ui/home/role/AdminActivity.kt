@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import com.example.transformmonitorapp.views.models.AdminViewModel
 
-import android.os.PersistableBundle
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -16,11 +15,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.transformmonitorapp.R
-import com.example.transformmonitorapp.data.network.ApiServiceProvider
 import com.example.transformmonitorapp.data.repository.impl.AdminRepositoryImpl
-import com.example.transformmonitorapp.data.repository.impl.CreatorRepositoryImpl
 import com.example.transformmonitorapp.domain.dto.request.TransformerRequest
-import com.example.transformmonitorapp.views.models.CreatorViewModel
 
 class AdminActivity : RoleActivity() {
 

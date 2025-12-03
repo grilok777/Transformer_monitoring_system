@@ -42,7 +42,7 @@ class AnalystActivity : RoleActivity() {
         super.onCreate(savedInstanceState)
         bindViews()
         observeViewModel()
-
+        navigateToProfile()
         btnExportOne.setOnClickListener { showIdInputDialog(action = Action.EXPORT_ONE) }
         btnExportRange.setOnClickListener { showRangeDialog() }
         btnExportAll.setOnClickListener { viewModel.exportAllTransformers() }

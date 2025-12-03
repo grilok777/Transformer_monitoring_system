@@ -38,8 +38,8 @@ class OperatorActivity : RoleActivity() {
         super.onCreate(savedInstanceState)
         bindViews()
         observeViewModel()
-        setupProfileView()
         setupListeners()
+        navigateToProfile()
     }
 
     private fun bindViews() {
