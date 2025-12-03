@@ -7,6 +7,7 @@ import com.example.transformmonitorapp.data.network.api.AuthApi
 import com.example.transformmonitorapp.data.network.api.CreatorApi
 import com.example.transformmonitorapp.data.network.api.HomeApi
 import com.example.transformmonitorapp.data.network.api.OperatorApi
+import com.example.transformmonitorapp.data.network.api.ProfileApi
 
 object ApiServiceProvider {
 
@@ -25,6 +26,7 @@ object ApiServiceProvider {
     fun analystApi(context: Context): AnalystApi =
         RetrofitClient.getClient(context).create(AnalystApi::class.java)
 
-    fun homeApi(context: Context): HomeApi =
-        RetrofitClient.getClient(context).create(HomeApi::class.java)
+    fun profileApi(context: Context): ProfileApi =
+        RetrofitClient.getClient(context).create(ProfileApi::class.java)
+
 }

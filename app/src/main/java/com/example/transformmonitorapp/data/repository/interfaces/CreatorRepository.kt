@@ -5,6 +5,7 @@ import com.example.transformmonitorapp.domain.dto.response.MessageResponse
 import com.example.transformmonitorapp.domain.model.Role
 
 interface CreatorRepository{
+
     suspend fun getUsers(): List<UserDto>
 
     suspend fun getUsersByRole(role: String): List<UserDto>

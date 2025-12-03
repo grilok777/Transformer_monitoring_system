@@ -1,19 +1,14 @@
 package com.example.transformmonitorapp.ui.home.role
 
 import GenericViewModelFactory
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.transformmonitorapp.R
-import com.example.transformmonitorapp.data.network.ApiServiceProvider
-import com.example.transformmonitorapp.data.repository.impl.CreatorRepositoryImpl
 import com.example.transformmonitorapp.data.repository.impl.OperatorRepositoryImpl
-import com.example.transformmonitorapp.views.models.CreatorViewModel
 import com.example.transformmonitorapp.views.models.OperatorViewModel
 import kotlin.getValue
 
@@ -43,6 +38,7 @@ class OperatorActivity : RoleActivity() {
         super.onCreate(savedInstanceState)
         bindViews()
         observeViewModel()
+        setupProfileView()
         setupListeners()
     }
 
@@ -57,7 +53,6 @@ class OperatorActivity : RoleActivity() {
 
     override fun customizeAsideMenu() {}
 
-    override fun navigateToProfile() {}
     private fun observeViewModel() {
 
         viewModel.transformers.observe(this) { list ->

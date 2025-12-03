@@ -4,20 +4,14 @@ import GenericViewModelFactory
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.transformmonitorapp.R
-import com.example.transformmonitorapp.data.repository.impl.AdminRepositoryImpl
 import com.example.transformmonitorapp.data.repository.impl.AnalyticRepositoryImpl
-import com.example.transformmonitorapp.domain.dto.request.TransformerRequest
-import com.example.transformmonitorapp.ui.home.role.AdminActivity.Action
-import com.example.transformmonitorapp.views.models.AdminViewModel
 import com.example.transformmonitorapp.views.models.AnalystViewModel
 import kotlin.getValue
 
@@ -49,7 +43,6 @@ class AnalystActivity : RoleActivity() {
         bindViews()
         observeViewModel()
 
-
         btnExportOne.setOnClickListener { showIdInputDialog(action = Action.EXPORT_ONE) }
         btnExportRange.setOnClickListener { showRangeDialog() }
         btnExportAll.setOnClickListener { viewModel.exportAllTransformers() }
@@ -59,10 +52,6 @@ class AnalystActivity : RoleActivity() {
     }
 
     override fun customizeAsideMenu() {
-
-    }
-
-    override fun navigateToProfile() {
 
     }
 
@@ -104,7 +93,6 @@ class AnalystActivity : RoleActivity() {
                 when(action) {
                     Action.EXPORT_ONE -> "Експорт трансформатора"
                     Action.EXPORT_LOGS -> "Експорт логів"
-                    else -> "ID"
                 }
             )
             .setView(etId)
@@ -114,9 +102,8 @@ class AnalystActivity : RoleActivity() {
                     when(action) {
                         Action.EXPORT_ONE -> viewModel.exportTransformer(id)
                         Action.EXPORT_LOGS -> viewModel.exportLogs(id)
-                        else -> {}
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(this, "Невірний ID", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -143,7 +130,7 @@ class AnalystActivity : RoleActivity() {
                     val from = etFrom.text.toString().toLong()
                     val to = etTo.text.toString().toLong()
                     viewModel.exportTransformersRange(from, to)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(this, "Невірні ID", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -153,4 +140,3 @@ class AnalystActivity : RoleActivity() {
 
     enum class Action { EXPORT_ONE, EXPORT_LOGS }
 }
-

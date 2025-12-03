@@ -24,4 +24,12 @@ class AuthRepositoryImpl(context: Context) : AuthRepository {
 
     override suspend fun pingUser(): Response<Unit> =
         api.ping()
+
+    override suspend fun updateUser(
+        id: Long,
+        newName: String,
+        newEmail: String,
+        newPassword: String
+    ) {
+    }
 }

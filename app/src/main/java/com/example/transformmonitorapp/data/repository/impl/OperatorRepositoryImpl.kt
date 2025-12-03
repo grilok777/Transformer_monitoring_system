@@ -7,7 +7,6 @@ import com.example.transformmonitorapp.data.repository.interfaces.CreatorReposit
 import com.example.transformmonitorapp.data.repository.interfaces.OperatorRepository
 import com.example.transformmonitorapp.domain.dto.AlertDto
 import com.example.transformmonitorapp.domain.dto.TransformerDto
-import com.example.transformmonitorapp.domain.model.TransformerStatus
 
 
 class OperatorRepositoryImpl (
@@ -28,6 +27,6 @@ class OperatorRepositoryImpl (
     }
 
     override suspend fun processTransformerError(id: Long) {
-        operatorApi.processrError(id, "Bearer $token")
+        operatorApi.processError(id, "Bearer $token")
     }
 }

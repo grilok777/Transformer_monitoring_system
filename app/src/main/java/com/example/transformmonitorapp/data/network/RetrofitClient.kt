@@ -17,7 +17,6 @@ object RetrofitClient {
     fun getClient(context: Context): Retrofit {
         if (retrofit != null) return retrofit!!
 
-        // Encrypted prefs
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
@@ -32,7 +31,6 @@ object RetrofitClient {
 
         val tokenManager = TokenManager(prefs)
 
-        // Базовий Retrofit для refresh
         val authRetrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

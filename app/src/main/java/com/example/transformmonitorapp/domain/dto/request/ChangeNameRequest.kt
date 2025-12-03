@@ -1,3 +1,3 @@
 package com.example.transformmonitorapp.domain.dto.request
 
-data class RefreshTokenRequest(val refreshToken: String)
+data class ChangeNameRequest(val id: Long, val name: String)

@@ -20,18 +20,21 @@
 
             <Button
                 android:id="@+id/btnCreate"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Створити трансформатор" />
 
             <Button
                 android:id="@+id/btnUpdate"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Редагувати трансформатор" />
 
             <Button
                 android:id="@+id/btnDeactivate"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Деактивувати трансформатор" />
@@ -40,18 +43,21 @@
 
             <Button
                 android:id="@+id/btnExportOne"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Експорт одного" />
 
             <Button
                 android:id="@+id/btnExportRange"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Експорт діапазону" />
 
             <Button
                 android:id="@+id/btnExportAll"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Експорт всіх" />
@@ -60,18 +66,21 @@
 
             <Button
                 android:id="@+id/btnAlerts"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Усі помилки" />
 
             <Button
                 android:id="@+id/btnCriticalAlerts"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Критичні помилки" />
 
             <Button
                 android:id="@+id/btnLogs"
+                style="@style/BaseButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Експорт логів" />

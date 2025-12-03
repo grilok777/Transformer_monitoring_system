@@ -4,6 +4,7 @@ import GenericViewModelFactory
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import com.example.transformmonitorapp.views.models.AdminViewModel
 
 import android.os.PersistableBundle
@@ -50,7 +51,7 @@ class AdminActivity : RoleActivity() {
         super.onCreate(savedInstanceState)
         bindViews()
         observeViewModel()
-
+        navigateToProfile()
 
         btnCreate.setOnClickListener { showCreateDialog() }
         btnUpdate.setOnClickListener { showUpdateDialog() }
@@ -64,10 +65,6 @@ class AdminActivity : RoleActivity() {
     }
 
     override fun customizeAsideMenu() {
-
-    }
-
-    override fun navigateToProfile() {
 
     }
 
@@ -109,13 +106,29 @@ class AdminActivity : RoleActivity() {
             setPadding(16, 16, 16, 16)
         }
 
-        val etManufacturer = EditText(ctx).apply { hint = "Manufacturer" }
-        val etModel = EditText(ctx).apply { hint = "Model type" }
-        val etPower = EditText(ctx).apply { hint = "Rated power (kVA)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL }
-        val etPrimary = EditText(ctx).apply { hint = "Primary voltage (kV)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etSecondary = EditText(ctx).apply { hint = "Secondary voltage (kV)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etFreq = EditText(ctx).apply { hint = "Frequency (Hz)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL }
+        // Функція для створення EditText зі стилем і відступом
+        fun createEditText(hintText: String, inputType: Int = android.text.InputType.TYPE_CLASS_TEXT): EditText {
+            return EditText(ContextThemeWrapper(ctx, R.style.BaseEditText)).apply {
+                hint = hintText
+                this.inputType = inputType
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 12
+                }
+            }
+        }
 
+        val etManufacturer = createEditText("Manufacturer")
+        val etModel = createEditText("Model type")
+        val etPower = createEditText("Rated power (kVA)", android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
+        val etPrimary = createEditText("Primary voltage (kV)", android.text.InputType.TYPE_CLASS_NUMBER)
+        val etSecondary = createEditText("Secondary voltage (kV)", android.text.InputType.TYPE_CLASS_NUMBER)
+        val etFreq = createEditText("Frequency (Hz)", android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
+
+        // Додаємо всі EditText у layout
         layout.addView(etManufacturer)
         layout.addView(etModel)
         layout.addView(etPower)
@@ -123,18 +136,19 @@ class AdminActivity : RoleActivity() {
         layout.addView(etSecondary)
         layout.addView(etFreq)
 
+        // Створення діалогу
         AlertDialog.Builder(ctx)
             .setTitle("Створити трансформатор")
             .setView(layout)
             .setPositiveButton("Створити") { _, _ ->
                 try {
                     val req = TransformerRequest(
-                        manufacturer = etManufacturer.text.toString(),
-                        modelType = etModel.text.toString(),
-                        ratedPowerKVA = etPower.text.toString().toDouble(),
-                        primaryVoltageKV = etPrimary.text.toString().toInt(),
-                        secondaryVoltageKV = etSecondary.text.toString().toInt(),
-                        frequencyHz = etFreq.text.toString().toDouble()
+                        manufacturer = etManufacturer.text.toString().ifBlank { "Unknown" },
+                        modelType = etModel.text.toString().ifBlank { "Unknown" },
+                        ratedPowerKVA = etPower.text.toString().toDoubleOrNull() ?: 0.0,
+                        primaryVoltageKV = etPrimary.text.toString().toIntOrNull() ?: 0,
+                        secondaryVoltageKV = etSecondary.text.toString().toIntOrNull() ?: 0,
+                        frequencyHz = etFreq.text.toString().toDoubleOrNull() ?: 0.0
                     )
                     viewModel.createTransformer(req)
                 } catch (e: Exception) {
@@ -145,6 +159,7 @@ class AdminActivity : RoleActivity() {
             .show()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showUpdateDialog() {
         val ctx = this
         val layout = LinearLayout(ctx).apply {
@@ -206,7 +221,6 @@ class AdminActivity : RoleActivity() {
                     Action.DEACTIVATE -> "Деактивувати трансформатор"
                     Action.EXPORT_ONE -> "Експорт трансформатора"
                     Action.EXPORT_LOGS -> "Експорт логів"
-                    else -> "ID"
                 }
             )
             .setView(etId)
@@ -217,9 +231,8 @@ class AdminActivity : RoleActivity() {
                         Action.DEACTIVATE -> viewModel.deactivateTransformer(id)
                         Action.EXPORT_ONE -> viewModel.exportTransformer(id)
                         Action.EXPORT_LOGS -> viewModel.exportLogs(id)
-                        else -> {}
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(this, "Невірний ID", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -246,7 +259,7 @@ class AdminActivity : RoleActivity() {
                     val from = etFrom.text.toString().toLong()
                     val to = etTo.text.toString().toLong()
                     viewModel.exportTransformersRange(from, to)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(this, "Невірні ID", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -255,6 +268,4 @@ class AdminActivity : RoleActivity() {
     }
 
     enum class Action { DEACTIVATE, EXPORT_ONE, EXPORT_LOGS }
-
-
 }

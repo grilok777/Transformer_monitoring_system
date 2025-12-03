@@ -1,5 +1,6 @@
 package com.example.transformmonitorapp.views.adapters
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.view.ViewGroup
 import android.widget.TextView
@@ -12,12 +13,13 @@ class MenuAdapter(
 
     inner class MenuViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
         val textView = TextView(parent.context).apply {
             textSize = 18f
             setTypeface(typeface, Typeface.BOLD)
             setPadding(30, 16, 16, 16)
-            setTextColor(resources.getColor(R.color.textColor))
+            setTextColor(R.color.textColor)
         }
         return MenuViewHolder(textView)
     }

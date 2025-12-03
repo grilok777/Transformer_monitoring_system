@@ -1,90 +1,101 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <LinearLayout
-        android:id="@+id/operatorRoot"
+    <!-- ===== HEADER ===== -->
+    <include layout="@layout/layout_base_role"/>
+
+    <!-- ===== SCROLLABLE CONTENT ===== -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="602dp"
+        android:layout_weight="1"
+        android:padding="16dp">
 
-        <!-- ===== SECTION HEADER ===== -->
-        <TextView
-            android:id="@+id/tvOperatorTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Operator Tools"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingBottom="12dp" />
-
-        <!-- ===== INPUT FIELD ===== -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Transformer ID:"
-            android:textSize="14sp"
-            android:paddingBottom="4dp" />
-
-        <EditText
-            android:id="@+id/inputTransformerId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter transformer ID"
-            android:inputType="number"
-            android:background="@android:drawable/editbox_background_normal"
-            android:padding="10dp" />
-
-        <!-- ===== BUTTONS BLOCK ===== -->
         <LinearLayout
+            android:id="@+id/operatorRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="16dp"
-            android:gravity="center_horizontal">
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnGetAll"
+            <TextView
+                android:id="@+id/tvOperatorTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show All Transformers" />
+                android:paddingBottom="12dp"
+                android:text="Operator Tools"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnGetById"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:text="Transformer ID:"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/inputTransformerId"
+                style="@style/BaseEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show Transformer by ID"
-                android:layout_marginTop="8dp" />
+                android:background="@android:drawable/editbox_background_normal"
+                android:hint="Enter transformer ID"
+                android:inputType="number"
+                android:padding="10dp" />
 
-            <Button
-                android:id="@+id/btnGetAlerts"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show Transformer Alerts"
-                android:layout_marginTop="8dp" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="16dp">
 
-            <Button
-                android:id="@+id/btnProcessError"
+                <Button
+                    android:id="@+id/btnGetAll"
+                    style="@style/BaseButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Show All Transformers" />
+
+                <Button
+                    android:id="@+id/btnGetById"
+                    style="@style/BaseButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Show Transformer by ID" />
+
+                <Button
+                    android:id="@+id/btnGetAlerts"
+                    style="@style/BaseButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Show Transformer Alerts" />
+
+                <Button
+                    android:id="@+id/btnProcessError"
+                    style="@style/BaseButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Process Error" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvOutput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Process Error"
-                android:layout_marginTop="8dp" />
+                android:background="#EEEEEE"
+                android:padding="12dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:text="..."
+                android:textSize="16sp" />
+
         </LinearLayout>
-
-        <!-- ===== OUTPUT BLOCK ===== -->
-        <TextView
-            android:id="@+id/tvOutput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:textSize="16sp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:background="#EEEEEE"
-            android:padding="12dp" />
-
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>
