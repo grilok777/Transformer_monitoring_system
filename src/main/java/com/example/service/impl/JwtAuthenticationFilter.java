@@ -40,7 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
 
-            // Перевірка чи токен відкликаний
             if (revokedTokenRepository.existsByToken(jwt)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;

@@ -57,12 +57,9 @@ public class AuthServiceImpl implements AuthService {
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
 
-        String accessToken = jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15));
-        String refreshToken = jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30));
-
         return new JwtResponse(
-                accessToken,
-                refreshToken,
+                jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15)),
+                jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30)),
                 UserMapper.fromUserToDto(user)
         );
     }
@@ -100,12 +97,9 @@ public class AuthServiceImpl implements AuthService {
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
 
-        String newAccessToken = jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15));
-        String newRefreshToken = jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30));
-
         return new JwtResponse(
-                newAccessToken,
-                newRefreshToken,
+                jwtService.generateToken(userDetails, TimeUnit.MINUTES.toMillis(15)),
+                jwtService.generateToken(userDetails, TimeUnit.DAYS.toMillis(30)),
                 UserMapper.fromUserToDto(user)
         );
     }

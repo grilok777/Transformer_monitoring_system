@@ -3,7 +3,6 @@ package com.example.service.impl;
 import com.example.dto.AlertDto;
 import com.example.dto.TransformerDto;
 import com.example.dto.request.TransformerRequest;
-import com.example.entity.mongo.Transformer;
 import com.example.exception.TransformerNotFoundException;
 import com.example.mapper.AlertMapper;
 import com.example.mapper.TransformerMapper;

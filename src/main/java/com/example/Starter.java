@@ -11,6 +11,8 @@ import com.example.service.impl.OperatorServiceImpl;
 import com.example.service.interfaces.AuthService;
 import com.example.service.impl.CreatorServiceImpl;
 
+import com.example.service.interfaces.CreatorService;
+import com.example.service.interfaces.OperatorService;
 import com.example.service.interfaces.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -23,10 +25,10 @@ public class Starter implements CommandLineRunner {
 
     private final UserService userService;
     private final AuthService authService;
-    private final CreatorServiceImpl creatorService;
+    private final CreatorService creatorService;
     private String currentToken;
     private final Scanner scanner = new Scanner(System.in);
-    private final OperatorServiceImpl operatorService;
+    private final OperatorService operatorService;
 
     public Starter(UserService userService, AuthService authService, CreatorServiceImpl creatorService, OperatorServiceImpl operatorService) {
         this.userService = userService;

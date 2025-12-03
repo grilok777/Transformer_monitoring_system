@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.config.CustomUserDetails;
 import com.example.dto.UserDto;
+import com.example.dto.request.ChangeEmailRequest;
 import com.example.dto.request.ChangeNameRequest;
 import com.example.dto.request.ChangePasswordRequest;
 import com.example.dto.response.MessageResponse;
@@ -40,6 +41,13 @@ public class ProfileController{
             @RequestBody ChangePasswordRequest request) {
 
         userService.changePassword(request);
+        return ResponseEntity.ok(new MessageResponse("Password updated successfully"));
+    }
+
+    @PutMapping("/email")
+    public ResponseEntity<MessageResponse> changeEmail(
+            @RequestBody ChangeEmailRequest request){
+        userService.changeEmail(request);
         return ResponseEntity.ok(new MessageResponse("Password updated successfully"));
     }
 }
