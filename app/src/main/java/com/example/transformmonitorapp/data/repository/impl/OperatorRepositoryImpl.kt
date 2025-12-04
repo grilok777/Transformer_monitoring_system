@@ -2,6 +2,8 @@ package com.example.transformmonitorapp.data.repository.impl
 
 import android.content.Context
 import com.example.transformmonitorapp.data.network.ApiServiceProvider
+import com.example.transformmonitorapp.data.network.api.OperatorApi
+import com.example.transformmonitorapp.data.repository.interfaces.CreatorRepository
 import com.example.transformmonitorapp.data.repository.interfaces.OperatorRepository
 import com.example.transformmonitorapp.domain.dto.AlertDto
 import com.example.transformmonitorapp.domain.dto.TransformerDto

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/etManufacturer" style="@style/BaseEditText"
+            android:hint="Manufacturer" />
+
+        <EditText android:id="@+id/etModelType" style="@style/BaseEditText"
+            android:hint="Model type" />
+
+        <EditText android:id="@+id/etPower" style="@style/BaseEditText"
+            android:hint="Rated power (kVA)"
+            android:inputType="numberDecimal" />
+
+        <EditText android:id="@+id/etPrimary" style="@style/BaseEditText"
+            android:hint="Primary voltage (kV)"
+            android:inputType="number" />
+
+        <EditText android:id="@+id/etSecondary" style="@style/BaseEditText"
+            android:hint="Secondary voltage (kV)"
+            android:inputType="number" />
+
+        <EditText android:id="@+id/etFrequency" style="@style/BaseEditText"
+            android:hint="Frequency (Hz)"
+            android:inputType="numberDecimal" />
+
+        <Button
+            android:id="@+id/btnCreate"
+            android:text="Створити"
+            style="@style/BaseButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

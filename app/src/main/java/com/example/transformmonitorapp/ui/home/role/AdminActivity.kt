@@ -2,266 +2,320 @@ package com.example.transformmonitorapp.ui.home.role
 
 import GenericViewModelFactory
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
-import android.view.ContextThemeWrapper
-import com.example.transformmonitorapp.views.models.AdminViewModel
-
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.viewModels
+import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.transformmonitorapp.R
 import com.example.transformmonitorapp.data.repository.impl.AdminRepositoryImpl
 import com.example.transformmonitorapp.domain.dto.request.TransformerRequest
+import com.example.transformmonitorapp.views.adapters.AdminAlertAdapter
+import com.example.transformmonitorapp.views.adapters.MenuAdapter
+import com.example.transformmonitorapp.views.adapters.MenuItem
+import com.example.transformmonitorapp.views.models.AdminViewModel
 
 class AdminActivity : RoleActivity() {
 
-    val token: String by lazy { homeViewModel.loadToken() ?: "" }
+    private val token: String by lazy { homeViewModel.loadToken() ?: "" }
 
-    private lateinit var btnCreate: Button
-    private lateinit var btnUpdate: Button
-    private lateinit var btnDeactivate: Button
-    private lateinit var btnExportOne: Button
-    private lateinit var btnExportRange: Button
-    private lateinit var btnExportAll: Button
-    private lateinit var btnAlerts: Button
-    private lateinit var btnCriticalAlerts: Button
-    private lateinit var btnLogs: Button
-    private lateinit var tvOutput: TextView
-
+    private val alertsAdapter = AdminAlertAdapter()
     private val viewModel: AdminViewModel by viewModels {
         GenericViewModelFactory {
-            AdminViewModel(
-                application,
-                AdminRepositoryImpl(applicationContext, token)) }
+            AdminViewModel(application, AdminRepositoryImpl(applicationContext, token))
+        }
     }
 
-    override fun getLayoutId(): Int = R.layout.activity_admin
+    override fun getLayoutId(): Int = R.layout.layout_profile
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bindViews()
         observeViewModel()
         navigateToProfile()
-
-        btnCreate.setOnClickListener { showCreateDialog() }
-        btnUpdate.setOnClickListener { showUpdateDialog() }
-        btnDeactivate.setOnClickListener { showIdInputDialog(action = Action.DEACTIVATE) }
-        btnExportOne.setOnClickListener { showIdInputDialog(action = Action.EXPORT_ONE) }
-        btnExportRange.setOnClickListener { showRangeDialog() }
-        btnExportAll.setOnClickListener { viewModel.exportAllTransformers() }
-        btnAlerts.setOnClickListener { viewModel.getAllAlerts() }
-        btnCriticalAlerts.setOnClickListener { viewModel.getCriticalAlerts() }
-        btnLogs.setOnClickListener { showIdInputDialog(action = Action.EXPORT_LOGS) }
-    }
-
-    override fun customizeAsideMenu() {
-
-    }
-
-    private fun bindViews() {
-        btnCreate = findViewById(R.id.btnCreate)
-        btnUpdate = findViewById(R.id.btnUpdate)
-        btnDeactivate = findViewById(R.id.btnDeactivate)
-        btnExportOne = findViewById(R.id.btnExportOne)
-        btnExportRange = findViewById(R.id.btnExportRange)
-        btnExportAll = findViewById(R.id.btnExportAll)
-        btnAlerts = findViewById(R.id.btnAlerts)
-        btnCriticalAlerts = findViewById(R.id.btnCriticalAlerts)
-        btnLogs = findViewById(R.id.btnLogs)
-        tvOutput = findViewById(R.id.tvAdminOutput)
     }
 
     private fun observeViewModel() {
-        viewModel.status.observe(this) { s ->
-            Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+        // 1. Обробка СТАТУСУ (Помилки або успіх)
+        viewModel.status.observe(this) { msg ->
+            // Показуємо Toast, щоб користувач точно побачив
+            if (msg.isNotBlank()) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+                // Також дублюємо в текстове поле, якщо воно є на екрані
+                val currentTv = findViewById<TextView>(R.id.tvOutput)
+                // Пишемо в текст, тільки якщо це схоже на помилку або якщо поле ще пусте
+                if (currentTv != null && (msg.contains("Помилка") || currentTv.text == "Інформація з'явиться тут")) {
+                    currentTv.text = msg
+                }
+            }
         }
 
+        // 2. Обробка ОДНОГО трансформатора
         viewModel.transformerResult.observe(this) { t ->
-            tvOutput.text = t?.toString() ?: "Результат пустий"
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null && t != null) {
+                currentTv.text = t.toString()
+            }
         }
 
+        // 3. Обробка СПИСКУ трансформаторів (Range / All)
         viewModel.transformerList.observe(this) { list ->
-            tvOutput.text = list.joinToString("\n\n") { it.toString() }
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+
+            if (currentTv != null) {
+                if (!list.isNullOrEmpty()) {
+                    // Якщо є дані — виводимо список красиво
+                    currentTv.text = list.joinToString("\n\n") { it.toString() }
+                } else {
+                    // Якщо список прийшов порожнім (але це не очищення)
+                    // Перевіряємо, чи ми не робили clearState (зазвичай там null або пустий список)
+                    // Тут можна нічого не писати або написати "Список порожній"
+                    currentTv.text = "Список порожній"
+                }
+            }
         }
 
+        // 4. Обробка ЛОГІВ (TextResult)
         viewModel.textResult.observe(this) { txt ->
-            tvOutput.text = txt
-        }
-    }
-
-    private fun showCreateDialog() {
-        val ctx = this
-        val layout = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16, 16, 16, 16)
-        }
-
-        // Функція для створення EditText зі стилем і відступом
-        fun createEditText(hintText: String, inputType: Int = android.text.InputType.TYPE_CLASS_TEXT): EditText {
-            return EditText(ContextThemeWrapper(ctx, R.style.BaseEditText)).apply {
-                hint = hintText
-                this.inputType = inputType
-                setPadding(16, 16, 16, 16)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    bottomMargin = 12
-                }
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null && txt.isNotBlank()) {
+                currentTv.text = txt
             }
         }
 
-        val etManufacturer = createEditText("Manufacturer")
-        val etModel = createEditText("Model type")
-        val etPower = createEditText("Rated power (kVA)", android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
-        val etPrimary = createEditText("Primary voltage (kV)", android.text.InputType.TYPE_CLASS_NUMBER)
-        val etSecondary = createEditText("Secondary voltage (kV)", android.text.InputType.TYPE_CLASS_NUMBER)
-        val etFreq = createEditText("Frequency (Hz)", android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL)
+        // 5. Обробка ПОПЕРЕДЖЕНЬ (Alerts)
+        // Тут особлива логіка: оновлюємо Адаптер + пишемо кількість у текст
+        viewModel.alerts.observe(this) { list ->
+            // Оновлюємо таблицю (RecyclerView)
+            alertsAdapter.setData(list)
 
-        // Додаємо всі EditText у layout
-        layout.addView(etManufacturer)
-        layout.addView(etModel)
-        layout.addView(etPower)
-        layout.addView(etPrimary)
-        layout.addView(etSecondary)
-        layout.addView(etFreq)
-
-        // Створення діалогу
-        AlertDialog.Builder(ctx)
-            .setTitle("Створити трансформатор")
-            .setView(layout)
-            .setPositiveButton("Створити") { _, _ ->
-                try {
-                    val req = TransformerRequest(
-                        manufacturer = etManufacturer.text.toString().ifBlank { "Unknown" },
-                        modelType = etModel.text.toString().ifBlank { "Unknown" },
-                        ratedPowerKVA = etPower.text.toString().toDoubleOrNull() ?: 0.0,
-                        primaryVoltageKV = etPrimary.text.toString().toIntOrNull() ?: 0,
-                        secondaryVoltageKV = etSecondary.text.toString().toIntOrNull() ?: 0,
-                        frequencyHz = etFreq.text.toString().toDoubleOrNull() ?: 0.0
-                    )
-                    viewModel.createTransformer(req)
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Невірні дані: ${e.message}", Toast.LENGTH_SHORT).show()
+            // Оновлюємо текст статусу
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null) {
+                if (list.isNullOrEmpty()) {
+                    currentTv.text = "Записів не знайдено"
+                } else {
+                    currentTv.text = "Завантажено записів: ${list.size}"
                 }
             }
-            .setNegativeButton("Скасувати", null)
-            .show()
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun showUpdateDialog() {
-        val ctx = this
-        val layout = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16, 16, 16, 16)
         }
-
-        val etId = EditText(ctx).apply { hint = "ID (Long)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etManufacturer = EditText(ctx).apply { hint = "Manufacturer" }
-        val etModel = EditText(ctx).apply { hint = "Model type" }
-        val etPower = EditText(ctx).apply { hint = "Rated power (kVA)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL }
-        val etPrimary = EditText(ctx).apply { hint = "Primary voltage (kV)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etSecondary = EditText(ctx).apply { hint = "Secondary voltage (kV)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etFreq = EditText(ctx).apply { hint = "Frequency (Hz)"; inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL }
-        val cbCondition = CheckBox(ctx).apply { text = "Condition (OK=true)"; isChecked = true }
-        val cbRemote = CheckBox(ctx).apply { text = "Remote monitoring enabled"; isChecked = true }
-
-        layout.addView(etId)
-        layout.addView(etManufacturer)
-        layout.addView(etModel)
-        layout.addView(etPower)
-        layout.addView(etPrimary)
-        layout.addView(etSecondary)
-        layout.addView(etFreq)
-        layout.addView(cbCondition)
-        layout.addView(cbRemote)
-
-        AlertDialog.Builder(ctx)
-            .setTitle("Оновити трансформатор")
-            .setView(layout)
-            .setPositiveButton("Оновити") { _, _ ->
-                try {
-                    val id = etId.text.toString().toLong()
-                    val req = TransformerRequest(
-                        manufacturer = etManufacturer.text.toString(),
-                        modelType = etModel.text.toString(),
-                        ratedPowerKVA = etPower.text.toString().toDouble(),
-                        primaryVoltageKV = etPrimary.text.toString().toInt(),
-                        secondaryVoltageKV = etSecondary.text.toString().toInt(),
-                        frequencyHz = etFreq.text.toString().toDouble(),
-                        transformerCondition = cbCondition.isChecked,
-                        remoteMonitoring = cbRemote.isChecked
-                    )
-                    viewModel.updateTransformer(id, req)
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Невірні дані: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
     }
 
-    private fun showIdInputDialog(action: Action) {
-        val ctx = this
-        val etId = EditText(ctx).apply { hint = "ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER; setPadding(16,16,16,16) }
-        AlertDialog.Builder(ctx)
-            .setTitle(
-                when(action) {
-                    Action.DEACTIVATE -> "Деактивувати трансформатор"
-                    Action.EXPORT_ONE -> "Експорт трансформатора"
-                    Action.EXPORT_LOGS -> "Експорт логів"
-                }
+    // ================================
+    // ASIDE MENU
+    // ================================
+    override fun customizeAsideMenu() {
+        val menuItems = listOf(
+            MenuItem(R.string.admin_create) {
+                handleMenuAction(R.string.admin_create, R.layout.activity_admin_create) { setupCreatePage() }
+            },
+            MenuItem(R.string.admin_update) {
+                handleMenuAction(R.string.admin_update, R.layout.activity_admin_update) { setupUpdatePage() }
+            },
+            MenuItem(R.string.admin_deactivate) {
+                handleMenuAction(R.string.admin_deactivate, R.layout.activity_admin_deactivate) { setupDeactivatePage() }
+            },
+            MenuItem(R.string.admin_export_one) {
+                handleMenuAction(R.string.admin_export_one, R.layout.activity_admin_export_one) { setupExportOnePage() }
+            },
+            MenuItem(R.string.admin_export_range) {
+                handleMenuAction(R.string.admin_export_range, R.layout.activity_admin_export_range) { setupRangePage() }
+            },
+            MenuItem(R.string.admin_export_all) {
+                handleMenuAction(R.string.admin_export_all, R.layout.activity_admin_export_all) { setupExportAllPage() }
+            },
+            MenuItem(R.string.admin_alerts) {
+                handleMenuAction(R.string.admin_alerts, R.layout.activity_admin_alerts) { setupAlertsPage() }
+            },
+            MenuItem(R.string.admin_critical_alerts) {
+                handleMenuAction(R.string.admin_critical_alerts, R.layout.activity_admin_critical_alerts) { setupCriticalAlertsPage() }
+            },
+            MenuItem(R.string.admin_logs) {
+                handleMenuAction(R.string.admin_logs, R.layout.activity_admin_logs) { setupLogsPage() }
+            }
+        )
+
+        menuContainer.addView(
+            RecyclerView(this).apply {
+                layoutManager = LinearLayoutManager(this@AdminActivity)
+                adapter = MenuAdapter(menuItems)
+            }
+        )
+    }
+
+    private fun handleMenuAction(titleRes: Int, layoutRes: Int, extra: (() -> Unit)? = null) {
+        viewModel.clearState()
+
+        header.tvTitle.setText(titleRes)
+        setContentLayout(layoutRes)
+        extra?.invoke()
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    // ================================
+    // PAGES
+    // ================================
+
+    // 1 — CREATE
+    private fun setupCreatePage() {
+        val man = findViewById<EditText>(R.id.etManufacturer)
+        val model = findViewById<EditText>(R.id.etModelType)
+        val power = findViewById<EditText>(R.id.etPower)
+        val primary = findViewById<EditText>(R.id.etPrimary)
+        val secondary = findViewById<EditText>(R.id.etSecondary)
+        val freq = findViewById<EditText>(R.id.etFrequency)
+        val btn = findViewById<Button>(R.id.btnCreate)
+
+        btn?.setOnClickListener {
+            val req = TransformerRequest(
+                manufacturer = man.text.toString(),
+                modelType = model.text.toString(),
+                ratedPowerKVA = power.text.toString().toDoubleOrNull() ?: 0.0,
+                primaryVoltageKV = primary.text.toString().toIntOrNull() ?: 0,
+                secondaryVoltageKV = secondary.text.toString().toIntOrNull() ?: 0,
+                frequencyHz = freq.text.toString().toDoubleOrNull() ?: 0.0
             )
-            .setView(etId)
-            .setPositiveButton("OK") { _, _ ->
-                try {
-                    val id = etId.text.toString().toLong()
-                    when(action) {
-                        Action.DEACTIVATE -> viewModel.deactivateTransformer(id)
-                        Action.EXPORT_ONE -> viewModel.exportTransformer(id)
-                        Action.EXPORT_LOGS -> viewModel.exportLogs(id)
-                    }
-                } catch (_: Exception) {
-                    Toast.makeText(this, "Невірний ID", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
-    }
-
-    private fun showRangeDialog() {
-        val ctx = this
-        val layout = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16,16,16,16)
+            viewModel.createTransformer(req)
         }
-        val etFrom = EditText(ctx).apply { hint = "From ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etTo = EditText(ctx).apply { hint = "To ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        layout.addView(etFrom)
-        layout.addView(etTo)
-
-        AlertDialog.Builder(ctx)
-            .setTitle("Експорт діапазону (from..to)")
-            .setView(layout)
-            .setPositiveButton("Експорт") { _, _ ->
-                try {
-                    val from = etFrom.text.toString().toLong()
-                    val to = etTo.text.toString().toLong()
-                    viewModel.exportTransformersRange(from, to)
-                } catch (_: Exception) {
-                    Toast.makeText(this, "Невірні ID", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
     }
 
-    enum class Action { DEACTIVATE, EXPORT_ONE, EXPORT_LOGS }
+    // 2 — UPDATE
+    private fun setupUpdatePage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val man = findViewById<EditText>(R.id.etManufacturer)
+        val model = findViewById<EditText>(R.id.etModelType)
+        val power = findViewById<EditText>(R.id.etPower)
+        val primary = findViewById<EditText>(R.id.etPrimary)
+        val secondary = findViewById<EditText>(R.id.etSecondary)
+        val freq = findViewById<EditText>(R.id.etFrequency)
+        val cond = findViewById<CheckBox>(R.id.cbCondition)
+        val remote = findViewById<CheckBox>(R.id.cbRemote)
+        val btn = findViewById<Button>(R.id.btnUpdate)
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull()
+            if (longId == null) {
+                Toast.makeText(this, "Invalid ID", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val req = TransformerRequest(
+                manufacturer = man.text.toString(),
+                modelType = model.text.toString(),
+                ratedPowerKVA = power.text.toString().toDoubleOrNull() ?: 0.0,
+                primaryVoltageKV = primary.text.toString().toIntOrNull() ?: 0,
+                secondaryVoltageKV = secondary.text.toString().toIntOrNull() ?: 0,
+                frequencyHz = freq.text.toString().toDoubleOrNull() ?: 0.0,
+                transformerCondition = cond.isChecked,
+                remoteMonitoring = remote.isChecked
+            )
+
+            viewModel.updateTransformer(longId, req)
+        }
+    }
+
+    // 3 — DEACTIVATE
+    private fun setupDeactivatePage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val btn = findViewById<Button>(R.id.btnDeactivate)
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull() ?: return@setOnClickListener
+            viewModel.deactivateTransformer(longId)
+        }
+    }
+
+    // 4 — EXPORT ONE
+    private fun setupExportOnePage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Більше ніяких observe() тут!
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull()
+            if (longId == null) {
+                Toast.makeText(this, "Введіть ID", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ставимо текст "Завантаження...", результат прийде через observeViewModel
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportTransformer(longId)
+        }
+    }
+
+    // 5 — EXPORT RANGE
+    private fun setupRangePage() {
+        val from = findViewById<EditText>(R.id.etFrom)
+        val to = findViewById<EditText>(R.id.etTo)
+        val btn = findViewById<Button>(R.id.btnLoadRange)
+
+        btn?.setOnClickListener {
+            val f = from.text.toString().toLongOrNull() ?: return@setOnClickListener
+            val t = to.text.toString().toLongOrNull() ?: return@setOnClickListener
+
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportTransformersRange(f, t)
+        }
+    }
+
+    // 6 — EXPORT ALL
+    private fun setupExportAllPage() {
+        val btn = findViewById<Button>(R.id.btnLoadAll)
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportAllTransformers()
+        }
+    }
+
+    // 7 — ALL ALERTS
+    private fun setupAlertsPage() {
+        val rv = findViewById<RecyclerView>(R.id.rvAlerts)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Налаштовуємо RecyclerView, використовуючи наш глобальний адаптер
+        rv?.layoutManager = LinearLayoutManager(this)
+        rv?.adapter = alertsAdapter
+
+        // Візуально очищаємо список перед новим запитом (щоб не миготіли старі дані)
+        alertsAdapter.setData(emptyList())
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.getAllAlerts()
+        }
+    }
+
+    // 8 — CRITICAL ALERTS
+    private fun setupCriticalAlertsPage() {
+        val rv = findViewById<RecyclerView>(R.id.rvAlerts)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Те саме: підключаємо адаптер
+        rv?.layoutManager = LinearLayoutManager(this)
+        rv?.adapter = alertsAdapter
+        alertsAdapter.setData(emptyList())
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.getCriticalAlerts()
+        }
+    }
+
+    // 9 — LOGS
+    private fun setupLogsPage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val btn = findViewById<Button>(R.id.btnLoadLogs)
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull() ?: return@setOnClickListener
+
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження логів..."
+            viewModel.exportLogs(longId)
+        }
+    }
 }

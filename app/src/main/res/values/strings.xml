@@ -25,5 +25,21 @@
     <string name="editProfile">Редагувати профіль</string>
     <string name="profile_with_username">Вітаємо, %1$s</string>
     <string name="name">Ім\'я</string>
+    <string name="activity_operator_all">Всі трансформатори</string>
+    <string name="activity_operator_by_id">Трансформатор за ID</string>
+    <string name="activity_operator_alerts">Попередження трансформатора</string>
+
+    <string name="admin_create">Внесення нового трансформатора</string>
+    <string name="admin_update">Оновлення даних трансформатора</string>
+    <string name="admin_deactivate">Дезактивування трансформатора</string>
+
+    <string name="admin_export_one">Експорт одного трансформатора</string>
+    <string name="admin_export_range">Експорт діапазона трансформаторів</string>
+    <string name="admin_export_all">Експорт всіх трансформаторів</string>
+
+    <string name="admin_alerts">Всі попередження трансформатора</string>
+    <string name="admin_critical_alerts">Критичні попередження трансформатора</string>
+    <string name="admin_logs">Всі логи трансформатора</string>
+
 
 </resources>

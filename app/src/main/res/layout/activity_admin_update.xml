@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/etId" style="@style/BaseEditText"
+            android:hint="Transformer ID" android:inputType="number" />
+
+        <EditText android:id="@+id/etManufacturer" style="@style/BaseEditText"
+            android:hint="Manufacturer" />
+
+        <EditText android:id="@+id/etModelType" style="@style/BaseEditText"
+            android:hint="Model type" />
+
+        <EditText android:id="@+id/etPower" style="@style/BaseEditText"
+            android:hint="Rated power (kVA)" android:inputType="numberDecimal" />
+
+        <EditText android:id="@+id/etPrimary" style="@style/BaseEditText"
+            android:hint="Primary voltage (kV)" android:inputType="number" />
+
+        <EditText android:id="@+id/etSecondary" style="@style/BaseEditText"
+            android:hint="Secondary voltage (kV)" android:inputType="number" />
+
+        <EditText android:id="@+id/etFrequency" style="@style/BaseEditText"
+            android:hint="Frequency (Hz)" android:inputType="numberDecimal" />
+
+        <CheckBox
+            android:id="@+id/cbCondition"
+            android:text="Transformer Condition OK"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/cbRemote"
+            android:text="Remote Monitoring Enabled"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnUpdate"
+            android:text="Оновити"
+            style="@style/BaseButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

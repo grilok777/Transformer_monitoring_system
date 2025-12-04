@@ -10,22 +10,22 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.transformmonitorapp.R
 import com.example.transformmonitorapp.data.repository.impl.AnalyticRepositoryImpl
+import com.example.transformmonitorapp.views.adapters.AdminAlertAdapter
+import com.example.transformmonitorapp.views.adapters.MenuAdapter
+import com.example.transformmonitorapp.views.adapters.MenuItem
 import com.example.transformmonitorapp.views.models.AnalystViewModel
 import kotlin.getValue
 
 class AnalystActivity : RoleActivity() {
 
     val token: String by lazy { homeViewModel.loadToken() ?: "" }
+    private val alertsAdapter = AdminAlertAdapter()
 
-    private lateinit var btnExportOne: Button
-    private lateinit var btnExportRange: Button
-    private lateinit var btnExportAll: Button
-    private lateinit var btnAlerts: Button
-    private lateinit var btnCriticalAlerts: Button
-    private lateinit var btnLogs: Button
-    private lateinit var tvOutput: TextView
 
     private val viewModel: AnalystViewModel by viewModels {
         GenericViewModelFactory {
@@ -35,108 +35,215 @@ class AnalystActivity : RoleActivity() {
             ) }
     }
 
-    override fun getLayoutId(): Int = R.layout.activity_analyst
+    override fun getLayoutId(): Int = R.layout.layout_profile
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bindViews()
         observeViewModel()
         navigateToProfile()
-        btnExportOne.setOnClickListener { showIdInputDialog(action = Action.EXPORT_ONE) }
-        btnExportRange.setOnClickListener { showRangeDialog() }
-        btnExportAll.setOnClickListener { viewModel.exportAllTransformers() }
-        btnAlerts.setOnClickListener { viewModel.getAllAlerts() }
-        btnCriticalAlerts.setOnClickListener { viewModel.getCriticalAlerts() }
-        btnLogs.setOnClickListener { showIdInputDialog(action = Action.EXPORT_LOGS) }
     }
 
-    override fun customizeAsideMenu() {
 
-    }
 
-    private fun bindViews() {
-        btnExportOne = findViewById(R.id.btnExportOne)
-        btnExportRange = findViewById(R.id.btnExportRange)
-        btnExportAll = findViewById(R.id.btnExportAll)
-        btnAlerts = findViewById(R.id.btnAlerts)
-        btnCriticalAlerts = findViewById(R.id.btnCriticalAlerts)
-        btnLogs = findViewById(R.id.btnLogs)
-        tvOutput = findViewById(R.id.tvAdminOutput)
-    }
 
     private fun observeViewModel() {
-        viewModel.status.observe(this) { s ->
-            Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+        // 1. Обробка СТАТУСУ (Помилки або успіх)
+        viewModel.status.observe(this) { msg ->
+            // Показуємо Toast, щоб користувач точно побачив
+            if (msg.isNotBlank()) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+                // Також дублюємо в текстове поле, якщо воно є на екрані
+                val currentTv = findViewById<TextView>(R.id.tvOutput)
+                // Пишемо в текст, тільки якщо це схоже на помилку або якщо поле ще пусте
+                if (currentTv != null && (msg.contains("Помилка") || currentTv.text == "Інформація з'явиться тут")) {
+                    currentTv.text = msg
+                }
+            }
         }
 
+        // 2. Обробка ОДНОГО трансформатора
         viewModel.transformerResult.observe(this) { t ->
-            tvOutput.text = t?.toString() ?: "Результат пустий"
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null && t != null) {
+                currentTv.text = t.toString()
+            }
         }
 
+        // 3. Обробка СПИСКУ трансформаторів (Range / All)
         viewModel.transformerList.observe(this) { list ->
-            tvOutput.text = list.joinToString("\n\n") { it.toString() }
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+
+            if (currentTv != null) {
+                if (!list.isNullOrEmpty()) {
+                    // Якщо є дані — виводимо список красиво
+                    currentTv.text = list.joinToString("\n\n") { it.toString() }
+                } else {
+                    // Якщо список прийшов порожнім (але це не очищення)
+                    // Перевіряємо, чи ми не робили clearState (зазвичай там null або пустий список)
+                    // Тут можна нічого не писати або написати "Список порожній"
+                    currentTv.text = "Список порожній"
+                }
+            }
         }
 
+        // 4. Обробка ЛОГІВ (TextResult)
         viewModel.textResult.observe(this) { txt ->
-            tvOutput.text = txt
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null && txt.isNotBlank()) {
+                currentTv.text = txt
+            }
+        }
+
+        // 5. Обробка ПОПЕРЕДЖЕНЬ (Alerts)
+        // Тут особлива логіка: оновлюємо Адаптер + пишемо кількість у текст
+        viewModel.alerts.observe(this) { list ->
+            // Оновлюємо таблицю (RecyclerView)
+            alertsAdapter.setData(list)
+
+            // Оновлюємо текст статусу
+            val currentTv = findViewById<TextView>(R.id.tvOutput)
+            if (currentTv != null) {
+                if (list.isNullOrEmpty()) {
+                    currentTv.text = "Записів не знайдено"
+                } else {
+                    currentTv.text = "Завантажено записів: ${list.size}"
+                }
+            }
         }
     }
 
 
+    override fun customizeAsideMenu() {
+        val menuItems = listOf(
 
-    private fun showIdInputDialog(action: Action) {
-        val ctx = this
-        val etId = EditText(ctx).apply { hint = "ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER; setPadding(16,16,16,16) }
-        AlertDialog.Builder(ctx)
-            .setTitle(
-                when(action) {
-                    Action.EXPORT_ONE -> "Експорт трансформатора"
-                    Action.EXPORT_LOGS -> "Експорт логів"
-                }
-            )
-            .setView(etId)
-            .setPositiveButton("OK") { _, _ ->
-                try {
-                    val id = etId.text.toString().toLong()
-                    when(action) {
-                        Action.EXPORT_ONE -> viewModel.exportTransformer(id)
-                        Action.EXPORT_LOGS -> viewModel.exportLogs(id)
-                    }
-                } catch (_: Exception) {
-                    Toast.makeText(this, "Невірний ID", Toast.LENGTH_SHORT).show()
-                }
+            MenuItem(R.string.admin_export_one) {
+                handleMenuAction(R.string.admin_export_one, R.layout.activity_analyst_export_one) { setupExportOnePage() }
+            },
+            MenuItem(R.string.admin_export_range) {
+                handleMenuAction(R.string.admin_export_range, R.layout.activity_analyst_export_range) { setupRangePage() }
+            },
+            MenuItem(R.string.admin_export_all) {
+                handleMenuAction(R.string.admin_export_all, R.layout.activity_analyst_export_all) { setupExportAllPage() }
+            },
+            MenuItem(R.string.admin_alerts) {
+                handleMenuAction(R.string.admin_alerts, R.layout.activity_analyst_alerts) { setupAlertsPage() }
+            },
+            MenuItem(R.string.admin_critical_alerts) {
+                handleMenuAction(R.string.admin_critical_alerts, R.layout.activity_analyst_critical_alerts) { setupCriticalAlertsPage() }
+            },
+            MenuItem(R.string.admin_logs) {
+                handleMenuAction(R.string.admin_logs, R.layout.activity_analyst_logs) { setupLogsPage() }
             }
-            .setNegativeButton("Скасувати", null)
-            .show()
+        )
+
+        menuContainer.addView(
+            RecyclerView(this).apply {
+                layoutManager = LinearLayoutManager(this@AnalystActivity)
+                adapter = MenuAdapter(menuItems)
+            }
+        )
     }
 
-    private fun showRangeDialog() {
-        val ctx = this
-        val layout = LinearLayout(ctx).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16,16,16,16)
+    private fun handleMenuAction(titleRes: Int, layoutRes: Int, extra: (() -> Unit)? = null) {
+        viewModel.clearState()
+
+        header.tvTitle.setText(titleRes)
+        setContentLayout(layoutRes)
+        extra?.invoke()
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    // 4 — EXPORT ONE
+    private fun setupExportOnePage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Більше ніяких observe() тут!
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull()
+            if (longId == null) {
+                Toast.makeText(this, "Введіть ID", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ставимо текст "Завантаження...", результат прийде через observeViewModel
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportTransformer(longId)
         }
-        val etFrom = EditText(ctx).apply { hint = "From ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        val etTo = EditText(ctx).apply { hint = "To ID"; inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        layout.addView(etFrom)
-        layout.addView(etTo)
-
-        AlertDialog.Builder(ctx)
-            .setTitle("Експорт діапазону (from..to)")
-            .setView(layout)
-            .setPositiveButton("Експорт") { _, _ ->
-                try {
-                    val from = etFrom.text.toString().toLong()
-                    val to = etTo.text.toString().toLong()
-                    viewModel.exportTransformersRange(from, to)
-                } catch (_: Exception) {
-                    Toast.makeText(this, "Невірні ID", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Скасувати", null)
-            .show()
     }
 
-    enum class Action { EXPORT_ONE, EXPORT_LOGS }
+    // 5 — EXPORT RANGE
+    private fun setupRangePage() {
+        val from = findViewById<EditText>(R.id.etFrom)
+        val to = findViewById<EditText>(R.id.etTo)
+        val btn = findViewById<Button>(R.id.btnLoadRange)
+
+        btn?.setOnClickListener {
+            val f = from.text.toString().toLongOrNull() ?: return@setOnClickListener
+            val t = to.text.toString().toLongOrNull() ?: return@setOnClickListener
+
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportTransformersRange(f, t)
+        }
+    }
+
+    // 6 — EXPORT ALL
+    private fun setupExportAllPage() {
+        val btn = findViewById<Button>(R.id.btnLoadAll)
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.exportAllTransformers()
+        }
+    }
+
+    // 7 — ALL ALERTS
+    private fun setupAlertsPage() {
+        val rv = findViewById<RecyclerView>(R.id.rvAlerts)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Налаштовуємо RecyclerView, використовуючи наш глобальний адаптер
+        rv?.layoutManager = LinearLayoutManager(this)
+        rv?.adapter = alertsAdapter
+
+        // Візуально очищаємо список перед новим запитом (щоб не миготіли старі дані)
+        alertsAdapter.setData(emptyList())
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.getAllAlerts()
+        }
+    }
+
+    // 8 — CRITICAL ALERTS
+    private fun setupCriticalAlertsPage() {
+        val rv = findViewById<RecyclerView>(R.id.rvAlerts)
+        val btn = findViewById<Button>(R.id.btnLoad)
+
+        // Те саме: підключаємо адаптер
+        rv?.layoutManager = LinearLayoutManager(this)
+        rv?.adapter = alertsAdapter
+        alertsAdapter.setData(emptyList())
+
+        btn?.setOnClickListener {
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження..."
+            viewModel.getCriticalAlerts()
+        }
+    }
+
+    // 9 — LOGS
+    private fun setupLogsPage() {
+        val id = findViewById<EditText>(R.id.etId)
+        val btn = findViewById<Button>(R.id.btnLoadLogs)
+
+        btn?.setOnClickListener {
+            val longId = id.text.toString().toLongOrNull() ?: return@setOnClickListener
+
+            findViewById<TextView>(R.id.tvOutput)?.text = "Завантаження логів..."
+            viewModel.exportLogs(longId)
+        }
+    }
 }

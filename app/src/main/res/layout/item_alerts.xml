@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#EFEFEF">
+
+    <TextView
+        android:id="@+id/tvAlertId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ID:"
+        android:textStyle="bold"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAlertTransformer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transformer:"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAlertLevel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Level:"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAlertMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Message:"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAlertTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Time:"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvAlertStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Processed:"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btnResolve"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Resolve"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/primaryColor" />
+
+</LinearLayout>
